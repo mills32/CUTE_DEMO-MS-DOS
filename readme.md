@@ -1,8 +1,8 @@
 CUTE DEMO FOR MS_DOS
 --------------------
 
-I wanted to make a demo for an 8086 at 8 MHz, (It was my first PC, and I hated when a game refused to work because it used 286 instructions). 
-I wanted to use the VGA card to do something cute, but VGA not really designed with games or demos in mind, so it is difficult to make cool things whith it, if the main cpu is slow.
+I wanted to port my GBC demo to an 8086 at 8 MHz, (It was my first PC, and I hated when a game refused to work because it used 286 instructions). 
+I wanted to use the VGA card to do something cute, but VGA is not really designed with games or demos in mind, so it is difficult to make cool things whith it, if the main cpu is slow.
 
 I think the main problem with VGA, is games were made using the vga as a simple frame buffer, so the cpu had to do all the work. When EGA/VGA appeared, 286 CPUS were already popular, and they were so fast compared to 8086, that few games used tricks and functions the VGA had to speed up things. 
 
