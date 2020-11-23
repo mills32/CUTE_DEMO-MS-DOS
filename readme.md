@@ -1,7 +1,5 @@
-
-####################
 CUTE DEMO FOR MS_DOS
-####################
+--------------------
 
 I wanted to make a demo for an 8086 at 8 MHz, that was my first PC, and I hated when a game refused 
 to work because it used 286 instructions. But the VGA card is not really designed with games or demos 
@@ -14,38 +12,42 @@ compared to 8086, that few games used tricks and functions the VGA had to speed 
 So Let's see what the VGA has to offer for the poor and slow 8086.
 
 -Hardware scroll
----------------
+
 What?... Yes, it has hardware scroll but most games only use it to change "video page" to use the VGA
 as two frame buffers to draw. S0 it is possible to scroll a backgrond with nearly 0 CPU usage.
 
 -16 colors tile map mode
------------------------
+
 VGA(EGA and CGA) has a mode with character cells just like consoles, but it has only 2 colours per cell.
 Everybody calls it "text mode". As the hardware scroll works also in this mode, you can create maps 
 made of characters and scroll them whith 0 CPU usage. It has only one sprite (cursor). I only found a
 demo showing a map in text mode. I was going to use it in this demo, but I wanted more than 16 colours. 
 
 -32 bit transfers (VRAM to VRAM)
--------------------------------
+
 VGA can transfer 4 pixels at a time from vram to vram, this is usefull to update a column or a row when
 scrolling maps in mode x. I guess this was used a lot, but to fill the entire screen. In this demo all
 the scrolling maps you see, are the result of hardware scrolling + updates of 1 column and 1 row of tiles
 usinf this 32 bit transfers.
 
 -Split screen (Window)
----------------------
+
 A separate part of VRAM that can be used to show things at the bottom of the screen.
 
 -Palette cycles
----------------
+
 This was abused in games, thanks to palette cycling I faked huge animations for the demo.
 
 
 REQUIREMENTS
 ------------
+
 CPU: 8086 8 MHz
+
 GPU: VGA (256 KB VRAM)
+
 RAM: 512KB
+
 AUDIO: ADLIB/OPL2 compatible, or Gravis Ultrasound (or compatible)
 
 Does it work on an 8088 at 4.77?... We don't wanna know, it's a market we can do without... 
