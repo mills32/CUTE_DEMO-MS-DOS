@@ -8,7 +8,7 @@ I think the main problem with VGA, is games were made using the vga as a simple 
 
 So Let's see what the VGA has to offer for the poor and slow 8086.
 
--Hardware scroll
+[B]-Hardware scroll[/B]
 
 What?... Yes, it has hardware scroll but most games only use it to change "video page" to use the VGA as two frame buffers to draw. So it is possible to scroll a backgrond with nearly 0 CPU usage.
 
