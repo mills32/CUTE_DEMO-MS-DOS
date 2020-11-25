@@ -5,10 +5,8 @@ LOCALS
 .model large
 	
 	PUBLIC _Cog3D_Move
-	PUBLIC _Algae_Move
 	global _tile_tempdata
 	global cog3d_lines
-	global algae_waves
 
 
 .code
@@ -73,122 +71,6 @@ LOCAL _offset:word
 	ret
 	
 _Cog3D_Move endp
-
-
-_Algae_Move proc	far
-ARG   x:byte,frame:word
-	push bp
-	mov  bp, sp         ; caller's stack frame
-	;DRAW FAST LINES
-	;SET ADDRESS
-
-	push ds
-	push di
-	push si
-	
-	mov dx,003c4h
-	mov ax,0F02h
-	out dx,ax 		;write all the bitplanes.
-	
-	lds		si,dword ptr _tile_tempdata 	;ds:si RAM address;
-
-	mov 	ax,0A000h
-	mov 	es,ax
-	mov		di,(84*(247+47))				;es:di VRAM screen address
-	add		di,word ptr x
-	
-	mov		bx,frame				;offset frame
-	mov		ax,47					;Lines
-	mov		ch,0
-
-	;;DRAW FIRST ALGAE
-	loop_line2:
-		mov cl,8	;16 pixels
-		rep movsw	;COPY a line ds:si -> es:di
-		sub di,algae_waves[bx]
-		add bx,2
-		add di,algae_waves[bx]
-		sub di,84+16	;goto next line
-		
-		dec ax
-		jnz loop_line2
-	
-	;DRAW SECOND ALGAE
-	mov		di,(84*(247+47))
-	add		di,word ptr x
-	add		di,45
-	mov		bx,frame				;offset frame
-	mov		ax,33					;Lines
-	mov		ch,0
-	
-	loop_line3:
-		mov cl,8	;16 pixels
-		rep movsw	;COPY a line ds:si -> es:di
-		sub di,algae_waves[bx]
-		add bx,2
-		add di,algae_waves[bx]
-		sub di,84+16	;goto next line
-		
-		dec ax
-		jnz loop_line3
-	
-	;DRAW FISH
-	mov		di,(84*263)+29
-	mov		bx,frame
-	add		di,algae_waves[bx+52]
-	sub		di,6
-	mov		ax,16					;Lines
-	mov		ch,0
-	
-	loop_line5:
-		mov cl,12		;16 pixels
-		rep movsw		;COPY a line ds:si -> es:di
-		add di,84-24	;goto next line
-		
-		dec ax
-		jnz loop_line5
-	
-	;DRAW FISH 2
-	mov		di,(84*244)
-	mov		bx,frame
-	add		di,algae_waves[bx]
-	add		di,50
-	mov		ax,10					;Lines
-	mov		ch,0
-	
-	loop_line6:
-		mov cl,8		;16 pixels
-		rep movsw		;COPY a line ds:si -> es:di
-		add di,84-16	;goto next line
-		
-		dec ax
-		jnz loop_line6
-	
-	;DRAW BUBBLE
-	;mov		di,(84*244)+78
-	;add		di,0;word ptr x
-	;add		si,5*256				;GO TO BUBBLE
-	;mov		ax,16					;Lines
-	;mov		ch,0
-	
-	;loop_line4:
-	;	mov cl,8		;16 pixels
-	;	rep movsw		;COPY a line ds:si -> es:di
-	;	add di,84-16	;goto next line
-		
-	;	dec ax
-	;	jnz loop_line4
-	
-	
-	pop si
-	pop di
-	pop ds
-	mov sp, bp
-	pop bp
-
-	ret
-
-_Algae_Move endp
 
 
 cog3d_lines	label	word
@@ -687,24 +569,5 @@ dw 0C804h, 0C804h, 0C804h, 0C818h, 0C818h, 0C82Ch, 0C82Ch, 0C82Ch, 0C840h, 0C980
 dw 0C9BCh, 0C9D0h, 0C9D0h, 0C9D0h, 0C9E4h, 0C9E4h, 0C9F8h, 0C9F8h, 0CA0Ch, 0CA0Ch, 0CA0Ch, 0CA20h, 0CA20h, 0CA34h, 0CA34h, 0CA48h
 dw 0CA48h, 0CA48h, 0CA5Ch, 0CA5Ch, 0E0C8h, 0DA9Ch, 0DA9Ch, 0DA88h, 0DA74h, 0DA74h, 0DA60h, 0DA4Ch, 0D8F8h, 0D8F8h, 0D8E4h, 0D8D0h
 dw 0D8BCh, 0D8BCh, 0D8A8h, 0D894h, 0D754h, 0D740h, 0D72Ch, 0D718h, 0D718h, 0D704h, 0D6F0h, 0D6F0h, 0CD18h, 0CEA8h, 0D038h, 0D088h
-
-
-algae_waves	label word
-dw 4,4,5,5,6,6,6,7,7,7,7,8,8,8,8,8
-dw 8,8,8,8,8,8,7,7,7,7,6,6,6,5,5,4
-dw 4,4,3,3,2,2,2,1,1,1,1,0,0,0,0,0
-dw 0,0,0,0,0,0,1,1,1,1,2,2,2,3,3,4
-dw 4,4,5,5,6,6,6,7,7,7,7,8,8,8,8,8
-dw 8,8,8,8,8,8,7,7,7,7,6,6,6,5,5,4
-dw 4,4,3,3,2,2,2,1,1,1,1,0,0,0,0,0
-dw 0,0,0,0,0,0,1,1,1,1,2,2,2,3,3,4
-dw 4,4,5,5,6,6,6,7,7,7,7,8,8,8,8,8
-dw 8,8,8,8,8,8,7,7,7,7,6,6,6,5,5,4
-dw 4,4,3,3,2,2,2,1,1,1,1,0,0,0,0,0
-dw 0,0,0,0,0,0,1,1,1,1,2,2,2,3,3,4
-dw 4,4,5,5,6,6,6,7,7,7,7,8,8,8,8,8
-dw 8,8,8,8,8,8,7,7,7,7,6,6,6,5,5,4
-dw 4,4,3,3,2,2,2,1,1,1,1,0,0,0,0,0
-dw 0,0,0,0,0,0,1,1,1,1,2,2,2,3,3,4
 
 end

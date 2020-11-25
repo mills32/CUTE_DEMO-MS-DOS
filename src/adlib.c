@@ -67,9 +67,54 @@ void Adlib_Detect(){
         return;
     }
 }
-
+//139.264
 void interrupt play_music(void){
-    while (!imfwait){
+/*
+	asm push	es
+	asm push	ds
+	asm push	si
+	asm push	di
+	
+	asm lds bx,music_sdata
+	asm mov ax,music_offset
+	asm add bx,ax
+	asm mov music_offset,bx
+	//while (!imfwait){
+	asm mov ax,imfwait
+	asm jnz adlib_nloop
+	adlib_loop:
+		//imfwait = music_sdata[music_offset+2];
+		asm add bx,2
+		asm mov	ax,es:[bx]
+		asm mov imfwait,ax
+		//opl2_out(music_sdata[music_offset], music_sdata[music_offset+1]);
+		asm sub bx,2
+		asm mov ah,0
+		asm mov dx,00388h
+		asm mov al,byte ptr es:[bx]//music_sdata[music_offset]
+		asm out dx,al
+		asm inc dx
+		asm inc bx
+		asm mov al,byte ptr es:[bx]//music_sdata[music_offset+1]
+		asm out dx, al
+		//music_offset+=3;
+		asm add bx,3
+		asm mov music_offset,bx
+		//loop end
+		asm mov ax,imfwait
+		asm jz adlib_loop
+		
+	adlib_nloop:
+	asm dec ax
+	asm mov imfwait,ax
+	
+	asm pop	es
+	asm pop	ds
+	asm pop	si
+	asm pop	di
+*/
+	//byte *ost = music_sdata + music_offset;
+	while (!imfwait){
         imfwait = music_sdata[music_offset+2];
         opl2_out(music_sdata[music_offset], music_sdata[music_offset+1]);
 		music_offset+=3;
@@ -77,9 +122,10 @@ void interrupt play_music(void){
 	//ending song loop
 	if (music_offset > 0xBFAC) music_offset = 0;
 	imfwait--;
-	asm mov al,020h
-	asm mov dx,020h
-	asm out dx, al	//PIC, EOI
+
+	//asm mov al,020h
+	//asm mov dx,020h
+	//asm out dx, al	//PIC, EOI
 }
 
 void do_play_music(){
@@ -91,9 +137,9 @@ void do_play_music(){
 	//ending song loop
 	if (music_offset > 0xBFAC) music_offset = 0;
 	imfwait--;
-	asm mov al,020h
-	asm mov dx,020h
-	asm out dx, al	//PIC, EOI
+	//asm mov al,020h
+	//asm mov dx,020h
+	//asm out dx, al	//PIC, EOI
 }
 
 void Load_Music(char *fname){

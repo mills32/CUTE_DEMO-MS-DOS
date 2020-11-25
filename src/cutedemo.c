@@ -180,7 +180,9 @@ void Load_Credits();void Run_Credits();
 
 void main(){
 	char key = 0;
-	printf("Loading...\r");
+	printf("\nLoading...\r");
+	Adlib_Detect();
+	VGA_Fade_out_Text();
 	VGA_mode_X();//320x240 60Hz
 	VGA_Set_Window();
 	memset(tileset_palette,0x00,256*3);//All colours black
@@ -293,19 +295,16 @@ void Run_Intro(){
 		sprite[0].pos_x = 88+timer;
 		A++;
 		if (A == 4){A=0;timer++;}
-		if (timer == 0)Print(0,18,&introtext[(13*80)+80],0);
-		if (timer == 30)Print(0,18,&introtext[(13*80)+120],0);
-		if (timer == 60)Print(0,18,&introtext[(13*80)+160],0);
+		if (timer == 0)Print(0,19,&introtext[(13*80)+80],0);
+		if (timer == 30)Print(0,19,&introtext[(13*80)+120],0);
+		if (timer == 60)Print(0,19,&introtext[(13*80)+160],0);
 		VGA_Scroll_Vsync();
 	}
 	Unload_sprite(0);
 	timer = 0;
-	Print(0,18,&introtext[(13*80)+200],0);
-	Print(0,19,&introtext[(13*80)+240],0);
+	Print(0,19,&introtext[(13*80)+200],0);
+	Print(0,20,&introtext[(13*80)+240],0);
 	while (timer < 120) {timer++; VGA_Scroll_Vsync();}
-	
-	if (sound_mode == 2)Load_Music("music/atwist.imf");
-	if (sound_mode == 3)LoadMOD("music/atwist.mod");
 	
 	//Garbage screen
 	VGA_Set_palette_to_black();
@@ -322,11 +321,10 @@ void Run_Intro(){
 	SCR_Y = 0;
 	Scene = 1;
 	VGA_Scroll_Vsync();
-
+	Load_Music("music/atwist.imf");
 	while (timer < 128){
 		if (timer == 60) {
-			if (sound_mode==2)Start_Music();
-			if (sound_mode==3)PlayMOD(6,140);
+			Start_Music();
 		}
 		if (timer >60)Window_in();
 		timer++;
@@ -379,10 +377,10 @@ void Run_8086(){
 		Scroll_map();
 	}
 
+	VGA_Scroll_Vsync();
 	if (timer < 70) Window_out();
 	if (timer > 1000)Window_in();
 	timer++;
-	VGA_Scroll_Vsync();
 }
 
 //Perspective
@@ -394,10 +392,10 @@ void Load_Persp(){
 }
 void Run_Persp(){
 	Perspective_PaleteCycle();
+	VGA_Scroll_Vsync();
 	if (timer < 80) Window_out();
 	if (timer > 600) Window_in();
 	timer++;
-	VGA_Scroll_Vsync();
 }
 
 //Landscape
@@ -434,8 +432,8 @@ void Run_Land(){
 		if(SCR_Y < (16*6)-4){
 			SCR_Y++;
 			if (SCR_Y < 16*2)Scroll_map();
-			if ((SCR_Y > 16*2)&& (SCR_WY > (32*11)+4)) {
-				SCR_WY-=3;
+			if ((SCR_Y > 16*2)&& (SCR_WY != 340)) {
+				SCR_WY-=4;
 				VGA_MoveWindow();
 			}
 		}
@@ -448,23 +446,20 @@ void Run_Land(){
 		A++;
 	}
 	if ((timer > 899)&&(timer < 1000)){ 
-		//Clear_Sprite(9);
-		//Draw_Sprite(9);
-		//sprite[9].pos_x = 7*16;
-		//sprite[9].pos_y = -240+sint1[A];
+
 		if (SCR_Y !=0){
-			if (SCR_WY !=240*2){SCR_WY+=2;VGA_MoveWindow();}
+			if (SCR_WY != 240*2){SCR_WY+=2;VGA_MoveWindow();}
 			SCR_Y--;
 			Scroll_Map();
 		}
 		if (A == 29) A = 0;
 		A++;
 	}
+	
+	VGA_Scroll_Vsync();
 	if (timer == 1000){SCR_WY = 480;VGA_Set_Window();}
 	if (timer > 1000) Window_in();
-	
 	timer++;
-	VGA_Scroll_Vsync();
 }
 
 //Homer
@@ -487,7 +482,6 @@ void Run_Homer(){
 	Clear_Sprite(5);
 	Draw_Sprite(4);
 	Draw_Sprite(5);
-	
 	Homer_PaleteCycle();
 	if (A == 60) {A = 0;}
 	if (B == 40) {B = 0;sprite[4].pos_x++;sprite[5].pos_x++;}
@@ -496,10 +490,10 @@ void Run_Homer(){
 	sprite[4].pos_y = 40+Homer_Sin[A];
 	sprite[5].pos_y = (7*16)+Homer_Sin[A];
 	
+	VGA_Scroll_Vsync();
 	if (timer < 80) Window_out();
 	if (timer > 1000) Window_in();
 	timer++;A++;B++;
-	VGA_Scroll_Vsync();
 }
 
 //Cogs2D
@@ -512,10 +506,10 @@ void Load_Cog2D(){
 }
 void Run_Cog2D(){
 	Cog2D_PaleteCycle();
+	VGA_Scroll_Vsync();
 	if (timer < 80) Window_out();
 	if (timer > 600) Window_in();
 	timer++;
-	VGA_Scroll_Vsync();
 }
 
 ///cog3D
@@ -529,12 +523,12 @@ void Run_Cog3D(){
 	Cog3D_Move(A);
 	Cog3D_PaleteCycle();
 	//SCR_X+=2;
+	VGA_Scroll_Vsync();
 	if (timer < 80) Window_out();
 	if (timer > 1000) Window_in();
 	timer++;
 	A+=132*2;
 	if (A == 132*2*60) A = 0;
-	VGA_Scroll_Vsync();
 }
 
 ///Lisa
@@ -547,12 +541,12 @@ void Load_Lisa(){
 }
 void Run_Lisa(){
 	Lisa_PaleteCycle();
+	Endless_SideScroll_Map(0);
+	VGA_Scroll_Vsync();
 	if (timer < 80) Window_out();
 	if (timer > 600) Window_in();
 	timer++;
 	SCR_X+=2;
-	Endless_SideScroll_Map(0);
-	VGA_Scroll_Vsync();
 }
 
 //Sea
@@ -569,7 +563,7 @@ void Load_SeaWaves(){
 	A = 0;B = 0;C=0;frame = 0;SCR_X = 0; SCR_Y = 0;
 	timer = 0;
 	
-	sprite[10].pos_x = 198+(sint[B+80]<<1);
+	sprite[10].pos_x = 216+(sint[B+80]<<1);
 	sprite[10].pos_y = 6*16;
 	sprite[11].pos_x = 64+(sint[B]<<1);
 	sprite[11].pos_y = 8*16;
@@ -594,14 +588,11 @@ void Run_SeaWaves(){
 	
 	if (A == 3) {A = 0;sprite[6].frame++;sprite[7].frame++;sprite[8].frame++;sprite[9].frame++;}
 	if (B == 140) B = 0;
-	
-	if (timer < 80) Window_out();
-	if (timer > 1000) Window_in();
 
 	//sprite[8].pos_x = 170+A;
 	//sprite[9].pos_x = 170+A;
 	
-	sprite[10].pos_x = 198+(sint[B+80]<<1);
+	sprite[10].pos_x = 216+(sint[B+80]<<1);
 	sprite[11].pos_x = 64+(sint[B]<<1);
 	
 	B++;
@@ -611,8 +602,10 @@ void Run_SeaWaves(){
 	if (sprite[8].frame == 16)sprite[8].frame = 0;
 	if (sprite[9].frame == 16)sprite[9].frame = 0;
 	
-	timer++;
 	VGA_Scroll_Vsync();
+	if (timer < 80) Window_out();
+	if (timer > 1000) Window_in();
+	timer++;
 }
 
 //////////////////////////////////////////
@@ -646,15 +639,16 @@ void Run_Tower(){
 	
 	Tower_PaleteCycle();
 	
-	if (timer < 80) Window_out();
-	if (timer > 1000) Window_in();
+	
 	B+=2;
 	if (B==140)B = 0;
 	A++;
 	if (A==140)A = 0;
 
-	timer++;
 	VGA_Scroll_Vsync();
+	if (timer < 80) Window_out();
+	if (timer > 1000) Window_in();
+	timer++;
 }
 
 //////////////////////////////////////////
@@ -667,7 +661,7 @@ void Load_Roto(){
 	timer = 0;
 }
 void Run_Roto(){
-	if (timer < 80) Window_out();
+	
 	if (B == 180*150) B = 0;
 	//SCR_X+=2;
 	Roto_Zoom(SINEX[A&255],SINEY[A&255],B);
@@ -675,9 +669,11 @@ void Run_Roto(){
 	B+=150;
 	C = 0;
 	C++;
+	
+	VGA_Scroll_Vsync();
+	if (timer < 80) Window_out();
 	if (timer > 600) Window_in();
 	timer++;
-	VGA_Scroll_Vsync();
 }
 
 //////////////////////////////////////////
@@ -701,17 +697,19 @@ void Run_Chip(){
 	Chip_PaleteCycle();
 	
 	Endless_SideScroll_Map(0);
-	VGA_Scroll_Vsync();
+	
 	
 	sprite[9].pos_x = 180+SCR_X+sint[A];
-	sprite[9].pos_y = 100;
+	sprite[9].pos_y = 104+sint[B+70];
 	sprite[4].pos_x = 80+SCR_X+sint[B];
-	sprite[4].pos_y = 96;
+	sprite[4].pos_y = 112+sint[A+70];
 	
 	SCR_X++;A++;B++;
 	
 	if (A == 140) A = 0;
 	if (B == 140) B = 0;
+	
+	VGA_Scroll_Vsync();
 	if (timer < 80) Window_out();
 	if (timer > 600) Window_in();
 	timer++;
@@ -771,7 +769,6 @@ void Run_Ship(){
 
 	Endless_SideScroll_Map(0);
 	VGA_Scroll_Vsync();
-
 	if (timer < 60) {Window_out();SCR_X++;}
 	if (timer == 1000) {
 		SCR_WY = 240*2; 
@@ -803,10 +800,11 @@ void Run_Sea(){
 	if (A == 140) A = 0;
 	if (B == 4){ B = 0;C++;}
 	if (C == 10) C = 0;
+	
+	VGA_Scroll_Vsync();
 	if (timer < 60) Window_out();
 	if (timer > 1200) Window_in();
 	timer++;
-	VGA_Scroll_Vsync();
 }
 
 //CREDITS

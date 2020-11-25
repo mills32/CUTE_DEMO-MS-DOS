@@ -176,6 +176,20 @@ void VGA_Fade_out(){
 	VGA_Set_palette_to_black();
 }
 
+void VGA_Fade_out_text(){
+	byte color = 0x2A;
+	byte i = 0;
+	while (color) {
+		for (i = 1; i != 255; i++){
+			outportb(0x3C8, i);
+			outportb(0x3C9, color);
+			outportb(0x3C9, color);
+			outportb(0x3C9, color);
+		}
+		color--;
+		VGA_Vsync();
+	}
+}
 
 //PALETTE CYCLING
 void Corruption_PaleteCycle(){
@@ -204,7 +218,7 @@ void Corruption_PaleteCycle(){
 
 	//asm STI //Set   Interrupt Flag (Enable  Interrupts)
 	
-	if (paloffset_C == 32) {paloffset_C = 0;paloffset_A+=9;SCR_X+=16;}
+	if (paloffset_C == 32) {paloffset_C = 0;paloffset_A+=9;}
 	if (paloffset_A == 9*2)paloffset_A=0;
 	paloffset_C++;
 }
@@ -421,7 +435,7 @@ void Homer_PaleteCycle(){
 	
 	//asm CLI
 	asm mov bx,0
-	asm mov cx,16*12
+	asm mov cx,16*3
 	asm mov al,byte ptr color0
 	
 	asm mov	dx,003c8h
@@ -435,8 +449,30 @@ void Homer_PaleteCycle(){
 	asm out dx,al
 	asm	mov al,byte ptr palette_cycle_homer[bx+2]
 	asm out dx,al
-
-	asm add bx,3
+	
+	asm	mov al,byte ptr palette_cycle_homer[bx+3]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_homer[bx+4]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_homer[bx+5]
+	asm out dx,al
+	
+	asm	mov al,byte ptr palette_cycle_homer[bx+6]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_homer[bx+7]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_homer[bx+8]
+	asm out dx,al
+	
+	asm	mov al,byte ptr palette_cycle_homer[bx+9]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_homer[bx+10]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_homer[bx+11]
+	asm out dx,al
+	
+	asm add bx,12
+	
 	asm	loop palette_changeho		//wait
 
 	//asm STI //Set   Interrupt Flag (Enable  Interrupts)

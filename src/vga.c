@@ -32,29 +32,7 @@ void VGA_mode_X(){
 	//disable cursor
 	outportb(0x3D4, 0x0A);
 	outportb(0x3D5, 0x20);
-	system("cls");
-	printf("                                                                                ");
-	printf("                                                                                ");
-	printf("                                                                                ");
-	printf("                                  SELECT SOUND                                  ");
-	printf("                                                                                ");
-	printf("                           0 => ADLIB / OPL2 Compatible                         ");
-	printf("                           1 => Gravis Ultrasound                               ");
-
-	while (kbhit() == 0);
-	sound_mode = getch() -48;
-	system("cls");
 	
-	if (sound_mode == 0)Adlib_Detect();
-	if (sound_mode == 1)Init_GUS();
-	if (sound_mode < 2) {
-		system("cls");
-		printf("\nNo sound card selected.\nSound is disabled.");
-		sleep(2);
-	}
-	
-	system("cls");
-	VGA_Fade_out();
 	system("cls");
 	
 	regs.h.ah = 0x00;
@@ -201,7 +179,7 @@ void VGA_SplitScreen(int line){
     push    cx
     push    dx
 	//Set the split screen scan line.
-    //cli		// make sure all the registers get set at once	
+    cli		// make sure all the registers get set at once	
 	
 	mov		dx,CRTC_INDEX
 	mov		ax,line
@@ -251,7 +229,7 @@ void VGA_SplitScreen(int line){
 	dec  dx							//Point to AC Index/Data reg (for writes only)
 	out  dx,al						//Write the new AC Mode Control setting with split screen pel panning suppression turned on	
 	
-    //sti
+    sti
     pop    dx
     pop    cx
     pop    ax
@@ -335,7 +313,7 @@ void VGA_Stretch_VRAM(){
 	byte stretch_timer = 0;
 	//Stretch vram
 	while (stretch != 7){
-		if (stretch_timer == 8) {stretch_timer= 0;stretch++;}
+		if (stretch_timer == 4) {stretch_timer= 0;stretch++;}
 		word_out(CRTC_INDEX, V_RETRACE_END, 0x2c);
 		word_out(CRTC_INDEX, MAX_SCAN_LINE, stretch);//Repeat scanline 4 times
 		word_out(0x03d4, V_RETRACE_END, 0x8e);
@@ -349,7 +327,7 @@ void VGA_UnStretch_VRAM(){
 	byte stretch_timer = 0;
 	//Stretch vram
 	while (stretch != 1){
-		if (stretch_timer == 8) {stretch_timer= 0;stretch--;}
+		if (stretch_timer == 4) {stretch_timer= 0;stretch--;}
 		word_out(CRTC_INDEX, V_RETRACE_END, 0x2c);
 		word_out(CRTC_INDEX, MAX_SCAN_LINE, stretch);//Repeat scanline 4 times
 		word_out(0x03d4, V_RETRACE_END, 0x8e);
@@ -369,8 +347,7 @@ void VGA_mode_text(){
 	int86(0x10, &regs, &regs);
 	VGA_SplitScreen(0);
 	
-	if (sound_mode == 2)Unload_Music();
-	if (sound_mode == 3)StopMOD();
+	Unload_Music();
 	
 	//Enable cursor
 	outportb(0x3D4, 0x0A);

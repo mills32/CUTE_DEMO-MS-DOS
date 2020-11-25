@@ -187,6 +187,7 @@ void VGA_Set_palette_to_black();
 void VGA_Set_palette(unsigned char *palette);
 void VGA_Fade_in();
 void VGA_Fade_out();
+void VGA_Fade_out_text();
 void Corruption_PaleteCycle();
 void P8086_PaleteCycle();
 void Perspective_PaleteCycle();
@@ -215,9 +216,3 @@ void Load_Music(char *fname);
 void Start_Music();
 void do_play_music();
 void Unload_Music();
-
-//GUS
-void Init_GUS();
-void LoadMOD(char *filename);
-void PlayMOD(byte sp, byte bp);
-void StopMOD();
