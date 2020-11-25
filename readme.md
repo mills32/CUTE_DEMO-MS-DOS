@@ -75,12 +75,9 @@ GPU: VGA (256 KB VRAM)
 
 RAM: 512KB
 
-AUDIO: ADLIB/OPL2 compatible, or Gravis Ultrasound (or compatible)
+AUDIO: ADLIB/OPL2 compatible
 
 Does it work on an 8088 at 4.77?... We don't wanna know, it's a market we can do without... Of course it works, but it is slower and has more glitches.
-
-
-If you use GUS, a very simple mod will be played, but I don't reccoment using this, unless you have a 286 or faster CPU.
 
 SVGA will show glitches when scrolling, so use just vga.
 
