@@ -28,7 +28,8 @@ So Let's see what the VGA has to offer for the poor and slow 8086.
 
   -Hardware scroll:
 
-What?... Yes, it has hardware scroll but most games only use it to change "video page" to use the VGA as two frame buffers to draw. So it is possible to scroll a backgrond with nearly 0 CPU usage.
+What?... Yes, it has hardware scroll but most games only use it to change "video page" to use the VGA as two frame buffers to draw. So it is possible to scroll a backgrond with nearly 0 CPU usage. 
+Some games that use VGA(or EGA) scroll are: Supaplex, Commander Keen(EGA), Double Dragon 3, Dyna Blaster... But The use some sort of double buffer and are a bit slow on the 8086.
 
   -16 colors tile map mode
 
