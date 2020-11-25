@@ -347,7 +347,7 @@ void VGA_mode_text(){
 	int86(0x10, &regs, &regs);
 	VGA_SplitScreen(0);
 	
-	Unload_Music();
+	Music_Unload();
 	
 	//Enable cursor
 	outportb(0x3D4, 0x0A);

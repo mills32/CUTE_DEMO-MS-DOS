@@ -74,6 +74,7 @@ word Scene = 0;
 word Part = 0;
 word timer = 0;
 byte frame = 0;
+word page = (84*244)+4; //Only for rotozoom
 int A = 0;
 int B = 0;
 int C = 0;
@@ -178,8 +179,11 @@ void Load_Sea();void Run_Sea();
 void Load_Credits();void Run_Credits();
 //////////////////////////////////////////
 
-void main(){
+void main(int argc, char *argv[]){
 	char key = 0;
+	if(argc > 1){
+	  printf("You selected scene %s.\nThe program will show scene %s after the intro.\n", argv[1], argv[1]);
+	}
 	printf("\nLoading...\r");
 	Adlib_Detect();
 	VGA_Fade_out_Text();
@@ -194,6 +198,11 @@ void main(){
 	timer = 0;
 	
 	Scene = 1;
+	if(argc > 1) {
+		Scene = atoi(argv[1]);
+		if (Scene > 13) Scene = 13;
+		Scene = 1+(Scene<<1);
+	}
 	reset_demo:
 	while(key != 27){
 		switch (Scene){
@@ -236,6 +245,7 @@ void main(){
 	
 	//If ESC key not pressed, go back to scene 1 
 	if (key != 27) {
+		Music_Add_Interrupt();
 		Clearkb();
 		VGA_Set_palette_to_black();
 		VGA_Set_Window();
@@ -247,6 +257,7 @@ void main(){
 		VGA_MoveWindow();
 		Set_FontWin_Color();
 		Scene = 1;
+		
 		asm jmp reset_demo
 	}
 	VGA_mode_text();
@@ -297,7 +308,7 @@ void Run_Intro(){
 		if (A == 4){A=0;timer++;}
 		if (timer == 0)Print(0,19,&introtext[(13*80)+80],0);
 		if (timer == 30)Print(0,19,&introtext[(13*80)+120],0);
-		if (timer == 60)Print(0,19,&introtext[(13*80)+160],0);
+		if (timer == 70)Print(0,19,&introtext[(13*80)+160],0);
 		VGA_Scroll_Vsync();
 	}
 	Unload_sprite(0);
@@ -319,12 +330,12 @@ void Run_Intro(){
 	Load_Map("maps/1_turtl.tmx",0);
 	
 	SCR_Y = 0;
-	Scene = 1;
+	
 	VGA_Scroll_Vsync();
-	Load_Music("music/atwist.imf");
+	Music_Load("music/atwist.imf");
 	while (timer < 128){
 		if (timer == 60) {
-			Start_Music();
+			Music_Add_Interrupt();
 		}
 		if (timer >60)Window_in();
 		timer++;
@@ -348,12 +359,14 @@ void Run_8086(){
 		SCR_Y -= 240;
 		VGA_Scroll_Vsync();
 		Part = 1;
+		Music_Remove_Interrupt();
 	}
 	if (Part == 1){
 		P8086_PaleteCycle();
 		if (SCR_X < SINEX[A])SCR_X+=2; else Part = 2;
 		if ((SCR_Y + 240 < SINEY[A]))SCR_Y++;
 		Scroll_map();
+		Music_Update();
 	}
 	if (Part == 2){
 		P8086_PaleteCycle();
@@ -363,18 +376,21 @@ void Run_8086(){
 		A++;
 		if (A == 256) {A = 0;B++;}
 		if (B == 4) Part = 3;
+		Music_Update();
 	}
 
 	if (Part == 3){
 		if (SCR_X > 0) SCR_X-=2;
-		if (SCR_Y +240 > 0) {SCR_Y--; P8086_PaleteCycle();}
+		if (SCR_Y +240 > 0) {SCR_Y--; P8086_PaleteCycle();Music_Update();}
 		else {
+			Music_Add_Interrupt();
 			Load_Map("maps/2_8086.tmx",0); //Paste map
 			VGA_Scroll_Vsync();
 			Load_Map("maps/0_win.tmx",1); //Paste window at address 0
 			Part = 4;
 		}
 		Scroll_map();
+		
 	}
 
 	VGA_Scroll_Vsync();
@@ -389,6 +405,7 @@ void Load_Persp(){
 	Load_Map("maps/3_persp.tmx",0);
 	A = 0;B = 0;SCR_X = 0; SCR_Y = 0;
 	timer = 0;
+	Music_Remove_Interrupt();
 }
 void Run_Persp(){
 	Perspective_PaleteCycle();
@@ -396,10 +413,12 @@ void Run_Persp(){
 	if (timer < 80) Window_out();
 	if (timer > 600) Window_in();
 	timer++;
+	Music_Update();
 }
 
 //Landscape
 void Load_Land(){
+	Music_Add_Interrupt();
 	Load_Sprite("sprites/van.bmp",9,32);
 	Set_Sprite_Animation(9,0,4,8);
 	Load_Tiles("maps/4_land.bmp",0);
@@ -476,6 +495,7 @@ void Load_Homer(){
 	sprite[4].pos_y = 40;
 	sprite[5].pos_x = 14*16;
 	sprite[5].pos_y = 7*16;
+	Music_Remove_Interrupt();
 }
 void Run_Homer(){
 	Clear_Sprite(4);
@@ -494,15 +514,18 @@ void Run_Homer(){
 	if (timer < 80) Window_out();
 	if (timer > 1000) Window_in();
 	timer++;A++;B++;
+	Music_Update();
 }
 
 //Cogs2D
 void Load_Cog2D(){
+	Music_Add_Interrupt();
 	Unload_sprite(4);
 	Load_Tiles("maps/6_cog2d.bmp",0);
 	Load_Map("maps/6_cog2d.tmx",0);
 	A = 0;B = 0;SCR_X = 0; SCR_Y = 0;
 	timer = 0;
+	Music_Remove_Interrupt();
 }
 void Run_Cog2D(){
 	Cog2D_PaleteCycle();
@@ -510,14 +533,17 @@ void Run_Cog2D(){
 	if (timer < 80) Window_out();
 	if (timer > 600) Window_in();
 	timer++;
+	Music_Update();
 }
 
 ///cog3D
 void Load_Cog3D(){
+	Music_Add_Interrupt();
 	Load_Tiles("maps/7_cog3d.bmp",0);
 	Load_Map("maps/7_cog3d.tmx",0);
 	A = 0;B = 0;SCR_X = 0; SCR_Y = 0;
 	timer = 0;
+	Music_Remove_Interrupt();
 }
 void Run_Cog3D(){
 	Cog3D_Move(A);
@@ -529,15 +555,18 @@ void Run_Cog3D(){
 	timer++;
 	A+=132*2;
 	if (A == 132*2*60) A = 0;
+	Music_Update();
 }
 
 ///Lisa
 void Load_Lisa(){
+	Music_Add_Interrupt();
 	Load_Tiles("maps/8_lisa.bmp",0);
 	Load_Map("maps/8_lisa.tmx",0);
 	A = 0;B = 0;SCR_X = 0; SCR_Y = 0;
 	map_offset_Endless = 1;
 	timer = 0;
+	Music_Remove_Interrupt();
 }
 void Run_Lisa(){
 	Lisa_PaleteCycle();
@@ -547,11 +576,13 @@ void Run_Lisa(){
 	if (timer > 600) Window_in();
 	timer++;
 	SCR_X+=2;
+	Music_Update();
 }
 
 //Sea
 extern int alga_framebin;
 void Load_SeaWaves(){
+	Music_Add_Interrupt();
 	alga_framebin = 0;
 	Load_Shape("sprites/alge.bmp",6);
 	Load_Shape("sprites/alge2.bmp",7);
@@ -656,21 +687,27 @@ void Run_Tower(){
 void Load_Roto(){
 	Unload_sprite(9);
 	Load_Image("maps/11_rotoz.bmp");
+	memset(&VGA[84*480],0,84*16);
 	VGA_Stretch_VRAM();
 	A = 0;B = 0;C=0;frame = 0;SCR_X = 0; SCR_Y = 0;
 	timer = 0;
 }
 void Run_Roto(){
 	
-	if (B == 180*150) B = 0;
-	//SCR_X+=2;
-	Roto_Zoom(SINEX[A&255],SINEY[A&255],B);
-	A++;
-	B+=150;
-	C = 0;
+	//This is the only part of the demo in wich I used double buffer
+	//(there were some glitches on the 8086)
+	if (C == 2) C = 0;
+	if (C == 0) {page = (84*484)+4;SCR_Y = 0;}
+	if (C == 1) {page = (84*244)+4;SCR_Y = 240;}
 	C++;
 	
 	VGA_Scroll_Vsync();
+	
+	if (B == 180*150) B = 0;
+	Roto_Zoom(SINEX[A&255],SINEY[A&255],B,page);
+	A++;
+	B+=150;
+	
 	if (timer < 80) Window_out();
 	if (timer > 600) Window_in();
 	timer++;
@@ -688,6 +725,7 @@ void Load_Chip(){
 	Set_Sprite_Animation(4,0,28,2);
 	A = 0;B = 70;SCR_X = 0; SCR_Y = 0;
 	timer = 0;
+	Music_Remove_Interrupt();
 }
 void Run_Chip(){
 	Clear_Sprite(9);
@@ -713,11 +751,13 @@ void Run_Chip(){
 	if (timer < 80) Window_out();
 	if (timer > 600) Window_in();
 	timer++;
+	Music_Update();
 }
 
 //////////////////////////////////////////
 //SHIP SCENE
 void Load_Ship(){
+	Music_Add_Interrupt();
 	Unload_sprite(9);Unload_sprite(4);
 	Load_Tiles("maps/13_ship.bmp",0);
 	Load_Map("maps/13_ship.tmx",0);
@@ -789,6 +829,7 @@ void Load_Sea(){
 	map_offset_Endless = 1;
 	timer = 0;
 	VGA_MoveWindow();
+	Music_Remove_Interrupt();
 }
 void Run_Sea(){
 	draw_big_rocket(120+SCR_X+sint[A],49,Rocket_Ani[C]);
@@ -805,10 +846,12 @@ void Run_Sea(){
 	if (timer < 60) Window_out();
 	if (timer > 1200) Window_in();
 	timer++;
+	Music_Update();
 }
 
 //CREDITS
 void Load_Credits(){
+	Music_Add_Interrupt();
 	Load_Tiles("maps/15_cred.bmp",0);
 	Load_Map("maps/15_cred.tmx",0);
 	A = 0;B = 0;SCR_X = 0; SCR_Y = 0;Part = 0;
@@ -822,6 +865,7 @@ void Run_Credits(){
 			map_offset = 14*20;
 			SCR_Y-=240;
 			Part = 1;
+			Music_Remove_Interrupt();
 		}
 	}
 	if (Part == 1){
@@ -831,6 +875,7 @@ void Run_Credits(){
 		if (A == 2){A = 0;SCR_Y++;}
 		Endless_DownScroll_map();
 		if (SCR_Y == 0) SCR_Y -= 240;
+		Music_Update();
 	}
 	timer++;
 	VGA_Scroll_Vsync();

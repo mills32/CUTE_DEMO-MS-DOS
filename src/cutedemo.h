@@ -203,7 +203,7 @@ void Credits_PaleteCycle();
 
 //SCANLINE AND ROTOZOOM EFFECTS
 void Cog3D_Move(word frame);
-void Roto_Zoom(byte x, byte y, word frame);
+void Roto_Zoom(byte x, byte y, word frame, word page);
 void Algae_Move(byte x, word frame);
 
 //VECTORS
@@ -212,7 +212,8 @@ void Load_Shape(char *file, int sprite_number);
 void Draw_Shape(int sprite_number);
 //ADLIB
 void Adlib_Detect();
-void Load_Music(char *fname);
-void Start_Music();
-void do_play_music();
-void Unload_Music();
+void Music_Load(char *fname);
+void Music_Add_Interrupt();
+void Music_Remove_Interrupt();
+void Music_Update();
+void Music_Unload();

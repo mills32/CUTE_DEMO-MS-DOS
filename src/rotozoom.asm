@@ -14,7 +14,7 @@ LOCALS
 	align   2
 	
 _Roto_Zoom proc	far
-ARG   x:byte,y:byte,frame:word
+ARG   x:byte,y:byte,frame:word,fpage:word
 LOCAL _offset:word
 	;COPY TO VGA VRAM
 	;SET ADDRESS
@@ -34,7 +34,7 @@ LOCAL _offset:word
 
 	mov 	ax,0A000h
 	mov 	es,ax
-	mov		di,(84*244)+4			;es:di screen address
+	mov		di,fpage		;es:di screen address
 	
 	mov		bx,frame		;offset frame*75*2
 	

@@ -196,7 +196,7 @@ void Corruption_PaleteCycle(){
 	
 	//asm CLI
 	
-	//Change palette to 32 colors
+	//Change palette to 3 colors
 	asm mov cx,3
 	asm mov bx,paloffset_A
 	
@@ -223,67 +223,6 @@ void Corruption_PaleteCycle(){
 	paloffset_C++;
 }
 
-void Road_PaleteCycle(){
-	
-	//asm CLI
-	
-	//Change palette to 32 colors
-	asm mov cx,16
-	asm mov bx,paloffset_C
-	
-	asm mov	dx,003c8h
-	asm mov al,0
-	asm out	dx,al
-	asm inc dx		//003c9h Palete register
-	
-	palette_changeR:
-	asm	mov al,byte ptr palette_cycle_road2[bx]
-	asm out dx,al
-	asm	mov al,byte ptr palette_cycle_road2[bx+1]
-	asm out dx,al
-	asm	mov al,byte ptr palette_cycle_road2[bx+2]
-	asm out dx,al
-	
-	asm add bx,3
-	asm	loop palette_changeR		//wait
-	
-	//Next 16 colors
-	asm mov cl,16
-	asm mov bx,paloffset_C
-	
-	palette_changeR1:
-	asm	mov al,byte ptr palette_cycle_road1[bx]
-	asm out dx,al
-	asm	mov al,byte ptr palette_cycle_road1[bx+1]
-	asm out dx,al
-	asm	mov al,byte ptr palette_cycle_road1[bx+2]
-	asm out dx,al
-	
-	asm add bx,3
-	asm	loop palette_changeR1		//wait
-	
-	//Next 16 colors
-	asm mov cl,32
-	asm mov bx,paloffset_A
-	
-	palette_changeR2:
-	asm	mov al,byte ptr palette_cycle_road0[bx]
-	asm out dx,al
-	asm	mov al,byte ptr palette_cycle_road0[bx+1]
-	asm out dx,al
-	asm	mov al,byte ptr palette_cycle_road0[bx+2]
-	asm out dx,al
-	
-	asm add bx,3
-	asm	loop palette_changeR2		//wait
-
-	//asm STI //Set   Interrupt Flag (Enable  Interrupts)
-	
-	paloffset_A+=3;
-	if (paloffset_A == 32*3)paloffset_A=0;
-	paloffset_C+=3;
-	if (paloffset_C == 16*3)paloffset_C=0;
-}
 
 void P8086_PaleteCycle(){
 	word color0 = SCR_Y;
@@ -428,6 +367,68 @@ void Perspective_PaleteCycle(){
 	
 	paloffset_A+=3;
 	if (paloffset_A == 32*3)paloffset_A=0;
+}
+
+void Road_PaleteCycle(){
+	
+	//asm CLI
+	
+	//Change palette to 32 colors
+	asm mov cx,16
+	asm mov bx,paloffset_C
+	
+	asm mov	dx,003c8h
+	asm mov al,0
+	asm out	dx,al
+	asm inc dx		//003c9h Palete register
+	
+	palette_changeR:
+	asm	mov al,byte ptr palette_cycle_road2[bx]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_road2[bx+1]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_road2[bx+2]
+	asm out dx,al
+	
+	asm add bx,3
+	asm	loop palette_changeR		//wait
+	
+	//Next 16 colors
+	asm mov cl,16
+	asm mov bx,paloffset_C
+	
+	palette_changeR1:
+	asm	mov al,byte ptr palette_cycle_road1[bx]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_road1[bx+1]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_road1[bx+2]
+	asm out dx,al
+	
+	asm add bx,3
+	asm	loop palette_changeR1		//wait
+	
+	//Next 16 colors
+	asm mov cl,32
+	asm mov bx,paloffset_A
+	
+	palette_changeR2:
+	asm	mov al,byte ptr palette_cycle_road0[bx]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_road0[bx+1]
+	asm out dx,al
+	asm	mov al,byte ptr palette_cycle_road0[bx+2]
+	asm out dx,al
+	
+	asm add bx,3
+	asm	loop palette_changeR2		//wait
+
+	//asm STI //Set   Interrupt Flag (Enable  Interrupts)
+	
+	paloffset_A+=3;
+	if (paloffset_A == 32*3)paloffset_A=0;
+	paloffset_C+=3;
+	if (paloffset_C == 16*3)paloffset_C=0;
 }
 
 void Homer_PaleteCycle(){

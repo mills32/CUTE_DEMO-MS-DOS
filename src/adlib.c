@@ -57,6 +57,9 @@ void Adlib_Detect(){
 		for (i=1; i<=0xF5; opl2_out(i++, 0));    //clear all registers
 		opl2_out(1, 0x20);  // Set WSE=1
 		printf("\nAdLib card detected.\n");
+		asm CLI
+		old_time_handler = getvect(0x1C);
+		asm STI
 		sound_mode = 2;
 		sleep(2);
         return;
@@ -67,52 +70,8 @@ void Adlib_Detect(){
         return;
     }
 }
-//139.264
+
 void interrupt play_music(void){
-/*
-	asm push	es
-	asm push	ds
-	asm push	si
-	asm push	di
-	
-	asm lds bx,music_sdata
-	asm mov ax,music_offset
-	asm add bx,ax
-	asm mov music_offset,bx
-	//while (!imfwait){
-	asm mov ax,imfwait
-	asm jnz adlib_nloop
-	adlib_loop:
-		//imfwait = music_sdata[music_offset+2];
-		asm add bx,2
-		asm mov	ax,es:[bx]
-		asm mov imfwait,ax
-		//opl2_out(music_sdata[music_offset], music_sdata[music_offset+1]);
-		asm sub bx,2
-		asm mov ah,0
-		asm mov dx,00388h
-		asm mov al,byte ptr es:[bx]//music_sdata[music_offset]
-		asm out dx,al
-		asm inc dx
-		asm inc bx
-		asm mov al,byte ptr es:[bx]//music_sdata[music_offset+1]
-		asm out dx, al
-		//music_offset+=3;
-		asm add bx,3
-		asm mov music_offset,bx
-		//loop end
-		asm mov ax,imfwait
-		asm jz adlib_loop
-		
-	adlib_nloop:
-	asm dec ax
-	asm mov imfwait,ax
-	
-	asm pop	es
-	asm pop	ds
-	asm pop	si
-	asm pop	di
-*/
 	//byte *ost = music_sdata + music_offset;
 	while (!imfwait){
         imfwait = music_sdata[music_offset+2];
@@ -123,12 +82,12 @@ void interrupt play_music(void){
 	if (music_offset > 0xBFAC) music_offset = 0;
 	imfwait--;
 
-	//asm mov al,020h
-	//asm mov dx,020h
-	//asm out dx, al	//PIC, EOI
+	asm mov al,020h
+	asm mov dx,020h
+	asm out dx, al	//PIC, EOI
 }
 
-void do_play_music(){
+void Music_Update(){
     while (!imfwait){
         imfwait = music_sdata[music_offset+2];
         opl2_out(music_sdata[music_offset], music_sdata[music_offset+1]);
@@ -137,12 +96,12 @@ void do_play_music(){
 	//ending song loop
 	if (music_offset > 0xBFAC) music_offset = 0;
 	imfwait--;
-	//asm mov al,020h
-	//asm mov dx,020h
-	//asm out dx, al	//PIC, EOI
+	asm mov al,020h
+	asm mov dx,020h
+	asm out dx, al	//PIC, EOI
 }
 
-void Load_Music(char *fname){
+void Music_Load(char *fname){
 	word offset = 0;
 	word offset1 = 0;
 	FILE *imfile = fopen(fname, "rb");
@@ -170,11 +129,10 @@ void Load_Music(char *fname){
 	}
 }
 
-void Start_Music(){
+void Music_Add_Interrupt(){
 	//set interrupt and start playing music
-	unsigned long spd = 1193182/50;
+	unsigned long spd = 1193182/60;
 	asm CLI //disable interrupts
-	old_time_handler = getvect(0x1C);
 	setvect(0x1C, play_music); //interrupt 1C not available on NEC 9800-series PCs.
 	outportb(0x43, 0x36);
 	outportb(0x40, spd);	//lo-byte
@@ -182,20 +140,20 @@ void Start_Music(){
 	asm STI  //enable interrupts
 }
 
-void Stop_Music(){
+void Music_Remove_Interrupt(){
 	asm CLI //disable interrupts
 	//reset interrupt
 	outportb(0x43, 0x36);
 	outportb(0x40, 0xFF);	//lo-byte
 	outportb(0x40, 0xFF);	//hi-byte
 	setvect(0x1C, old_time_handler);
-	opl2_clear();
+	//opl2_clear();
 	asm STI  //enable interrupts
-	music_offset = 0;
+	//music_offset = 0;
 }
 
-void Unload_Music(){
-	Stop_Music();
+void Music_Unload(){
+	Music_Remove_Interrupt();
 	music_size = NULL;
 	music_offset = NULL;
 	music_filetype = NULL;
