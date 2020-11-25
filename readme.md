@@ -6,6 +6,24 @@ I wanted to use the VGA card to do something cute, but VGA is not really designe
 
 I think the main problem with VGA, is games were made using the vga as a simple frame buffer, so the cpu had to do all the work. When EGA/VGA appeared, 286 CPUS were already popular, and they were so fast compared to 8086, that few games used tricks and functions the VGA had to speed up things. 
 
+REQUIREMENTS
+------------
+
+CPU: 8086 8 MHz
+
+GPU: VGA (256 KB VRAM)
+
+RAM: 512KB
+
+AUDIO: ADLIB/OPL2 compatible
+
+Does it work on an 8088 at 4.77?... We don't wanna know, it's a market we can do without... Of course it works, but it is slower and has more glitches.
+
+SVGA will show glitches when scrolling, so use just vga.
+
+VGA HARDWARE
+------------
+
 So Let's see what the VGA has to offer for the poor and slow 8086.
 
   -Hardware scroll:
@@ -65,21 +83,6 @@ So what is this? Just a bunch of cute scenes:
   -Parallax: This draws a big low res sprite, and fakes parallax using palette cycles + hardware scrolling.
   
   -Credits: Nothing special, palette cycles + hardware scrolling.
-
-REQUIREMENTS
-------------
-
-CPU: 8086 8 MHz
-
-GPU: VGA (256 KB VRAM)
-
-RAM: 512KB
-
-AUDIO: ADLIB/OPL2 compatible
-
-Does it work on an 8088 at 4.77?... We don't wanna know, it's a market we can do without... Of course it works, but it is slower and has more glitches.
-
-SVGA will show glitches when scrolling, so use just vga.
 
 
 NOTES
