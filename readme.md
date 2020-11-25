@@ -17,7 +17,7 @@ RAM: 512KB
 
 AUDIO: ADLIB/OPL2 compatible
 
-Does it work on an 8088 at 4.77?... We don't wanna know, it's a market we can do without... Of course it works, but it is slower and has more glitches.
+Does it work on an 8088 at 4.77?... We don't wanna know, it's a market we can do without... Of course it works, but it will show scrolling issues , slow music and glitchy sprites.
 
 SVGA will show glitches when scrolling, so use just vga.
 
