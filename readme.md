@@ -28,8 +28,8 @@ So Let's see what the VGA has to offer for the poor and slow 8086.
 
   -Hardware scroll:
 
-What?... Yes, it has hardware scroll but most games only use it to change "video page" to use the VGA as two frame buffers to draw. So it is possible to scroll a backgrond with nearly 0 CPU usage. 
-Some games that use VGA(or EGA) scroll are: Supaplex, Commander Keen(EGA), Double Dragon 3, Dyna Blaster... But The use some sort of double buffer and are a bit slow on the 8086.
+What?... Yes, it has hardware scroll but not too many games used this. Most of the time they used it to change "video page" to use the VGA as two frame buffers to draw. So it is possible to scroll a backgrond with nearly 0 CPU usage. 
+Some games that use VGA(or EGA) scroll are: Supaplex, Commander Keen(EGA), Double Dragon 3, Dyna Blaster... But The use some sort of double buffer and are a bit slow on the 8086. More recent games like turrican II seem to use it, but at this time nothing was programmed for slow 8086 CPU's.
 
   -16 colors tile map mode
 
@@ -59,7 +59,7 @@ So what is this? Just a bunch of cute scenes:
   -8086 Scroll: it uses hardware scroll and a software asm blitter to update one row + one column of the map.
   Also uses assembly code to update colours, so that it fakes a second layer.
   
-  -Mode 7: completely fake 3d effect made ising a prerendered image and palette cycles.
+  -Mode 7: completely fake 3d effect made using a pre rendered image and palette cycles.
   
   -Road: uses Hardware scrolling and hardware window to show two (real) layers. Road movement is faked using Palette cycles.
   
@@ -71,17 +71,17 @@ So what is this? Just a bunch of cute scenes:
   
   -Dental Plan: Again two faked layers (palette cycles + hardware scroll).
   
-  -Under the sea: I couldn't make a scanline wave effect so I just compiled some line/vector animations in assembly.
+  -Plasma: I couldn't make a scanline wave effect so I created this plasma. It uses a pre rendered texture in a a special way, so that the cycling   palette creates the plasma effect.
   
   -Castle: Just a pre rendered image with colours placed carefully to fake the rotation.
   
-  -Rotozoom: A real software rotozoom in assembly, thanks to people in Vintage Computer Federation.
+  -Rotozoom: A real software rotozoom in assembly, thanks to people in Vintage Computer Federation. Uses double buffer to avoid garbaje on 8086.
  
-  -Boat: A cute boat drawn using software blitter + assembly vector drawing + hardware scrolling/window. 
+  -Boat: A cute boat drawn using: software blitter + assembly vector drawing + hardware scrolling + Hardware window. 
 
   -Chips: a neat hardware scroll with two sprites and some palette cycling.
   
-  -Parallax: This draws a big low res sprite, and fakes parallax using palette cycles + hardware scrolling.
+  -Parallax: This draws a big low res rocket, and fakes parallax using palette cycles + hardware scrolling.
   
   -Credits: Nothing special, palette cycles + hardware scrolling.
 
