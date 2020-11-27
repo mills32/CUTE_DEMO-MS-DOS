@@ -144,13 +144,14 @@ char introtext[] = {"\
     COMPUTERS.                                                                  \
                                             PROGRAM TECHNIQUES USED HERE ARE    \
     WELL KNOWN, SO THE GOAL OF THIS         DEMO IS JUST TO BE CUTE.            \
-             PRESS ANY KEY                              THANKS!                 \
+             PRESS ANY KEY                                                      \
+                THANKS!                 \
                ---------                                                        \
    THANKS TO THE CREATORS OF RESOURCES     AND PROGRAM TECHNIQUES, I USED FOR   \
    THIS DEMO :).                                                                \
    SORRY IF I ABUSED VGA COLOR CYCLES      AND HARDWARE SCROLLING.              \
                                                                                 \
-                                                                                \
+                                        \
              - MILLS 2020 -             \
                LOADING...               \
            MAGICAL VGA CARD             \
