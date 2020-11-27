@@ -170,7 +170,7 @@ void Load_Homer();void Run_Homer();
 void Load_Cog2D();void Run_Cog2D();
 void Load_Cog3D();void Run_Cog3D();
 void Load_Lisa();void Run_Lisa();
-void Load_SeaWaves();void Run_SeaWaves();
+void Load_Plasma();void Run_Plasma();
 void Load_Tower();void Run_Tower();
 void Load_Roto();void Run_Roto();
 void Load_Chip();void Run_Chip();
@@ -181,8 +181,11 @@ void Load_Credits();void Run_Credits();
 
 void main(int argc, char *argv[]){
 	char key = 0;
+	char sce = 0;
 	if(argc > 1){
-	  printf("You selected scene %s.\nThe program will show scene %s after the intro.\n", argv[1], argv[1]);
+		sce = atoi(argv[1]);
+		if (sce > 13) sce = 13;
+		printf("You selected scene %i.\nThe program will show it after the intro.\n", sce);
 	}
 	printf("\nLoading...\r");
 	Adlib_Detect();
@@ -220,8 +223,8 @@ void main(int argc, char *argv[]){
 			case 12:Run_Cog3D(); break;
 			case 13:Load_Lisa(); Scene++;break;
 			case 14:Run_Lisa(); break;
-			case 15:Load_SeaWaves(); Scene++;break;
-			case 16:Run_SeaWaves(); break;
+			case 15:Load_Plasma(); Scene++;break;
+			case 16:Run_Plasma(); break;
 			case 17:Load_Tower(); Scene++;break;
 			case 18:Run_Tower(); break;
 			case 19:Load_Roto(); Scene++;break;
@@ -322,7 +325,7 @@ void Run_Intro(){
 	timer = 0;
 	Load_Tiles("maps/1_corrup.bmp",0);
 	Load_Map("maps/1_corrup.tmx",0);
-	while(timer < 300){Corruption_PaleteCycle();timer++;VGA_Scroll_Vsync();}
+	while(timer < 150){Corruption_PaleteCycle();timer++;VGA_Scroll_Vsync();}
 	timer = 0;
 	
 	VGA_Set_palette_to_black();
@@ -579,60 +582,18 @@ void Run_Lisa(){
 	Music_Update();
 }
 
-//Sea
-extern int alga_framebin;
-void Load_SeaWaves(){
+//Plasma
+//No real plasmas were harmed during the making of this demo
+void Load_Plasma(){
 	Music_Add_Interrupt();
-	alga_framebin = 0;
-	Load_Shape("sprites/alge.bmp",6);
-	Load_Shape("sprites/alge2.bmp",7);
-	Clone_Sprite(8,6);Clone_Sprite(9,7);
-	Load_Sprite("sprites/dory.bmp",10,32);
-	Load_Sprite("sprites/marlin.bmp",11,32);
-	Load_Tiles("maps/9_alga.bmp",0);
-	Load_Map("maps/9_alga.tmx",0);
+	Load_Tiles("maps/9_plasma.bmp",0);
+	Load_Map("maps/9_plasma.tmx",0);
 	A = 0;B = 0;C=0;frame = 0;SCR_X = 0; SCR_Y = 0;
+	map_offset_Endless = 1;
 	timer = 0;
-	
-	sprite[10].pos_x = 216+(sint[B+80]<<1);
-	sprite[10].pos_y = 6*16;
-	sprite[11].pos_x = 64+(sint[B]<<1);
-	sprite[11].pos_y = 8*16;
-	
-	sprite[8].frame = 6;
-	sprite[9].frame = 6;
 }
-void Run_SeaWaves(){
-	sprite[6].pos_x = 0;sprite[6].pos_y = 104;
-	sprite[7].pos_x = 24;sprite[7].pos_y = 104;
-	Draw_Shape(6);Draw_Shape(7);
-
-	sprite[8].pos_x = 160;sprite[8].pos_y = 104;
-	sprite[9].pos_x = 174;sprite[9].pos_y = 104;
-	Draw_Shape(8);Draw_Shape(9);
-
-	if (B == 35) {sprite[10].frame = 0;sprite[11].frame = 0;}
-	if (B == 105) {sprite[10].frame = 1;sprite[11].frame = 1;}
-
-	Draw_Sprite(10);
-	Draw_Sprite(11);
-	
-	if (A == 3) {A = 0;sprite[6].frame++;sprite[7].frame++;sprite[8].frame++;sprite[9].frame++;}
-	if (B == 140) B = 0;
-
-	//sprite[8].pos_x = 170+A;
-	//sprite[9].pos_x = 170+A;
-	
-	sprite[10].pos_x = 216+(sint[B+80]<<1);
-	sprite[11].pos_x = 64+(sint[B]<<1);
-	
-	B++;
-	A++;
-	if (sprite[6].frame == 16)sprite[6].frame = 0;
-	if (sprite[7].frame == 16)sprite[7].frame = 0;
-	if (sprite[8].frame == 16)sprite[8].frame = 0;
-	if (sprite[9].frame == 16)sprite[9].frame = 0;
-	
+void Run_Plasma(){
+	Plasma_PaleteCycle();
 	VGA_Scroll_Vsync();
 	if (timer < 80) Window_out();
 	if (timer > 1000) Window_in();
@@ -642,8 +603,6 @@ void Run_SeaWaves(){
 //////////////////////////////////////////
 //TOWER SCENE
 void Load_Tower(){
-	Unload_sprite(6);Unload_sprite(7);
-	Unload_sprite(10);Unload_sprite(11);
 	Load_Sprite("sprites/bat.bmp",9,32);
 	Set_Sprite_Animation(9,0,4,8);
 	Clone_Sprite(10,9);
@@ -687,13 +646,12 @@ void Run_Tower(){
 void Load_Roto(){
 	Unload_sprite(9);
 	Load_Image("maps/11_rotoz.bmp");
-	memset(&VGA[84*480],0,84*16);
+	memset(&VGA[84*480],0,84*32);
 	VGA_Stretch_VRAM();
 	A = 0;B = 0;C=0;frame = 0;SCR_X = 0; SCR_Y = 0;
 	timer = 0;
 }
 void Run_Roto(){
-	
 	//This is the only part of the demo in wich I used double buffer
 	//(there were some glitches on the 8086)
 	if (C == 2) C = 0;
@@ -702,14 +660,14 @@ void Run_Roto(){
 	C++;
 	
 	VGA_Scroll_Vsync();
+	if (timer < 80) Window_out();
+	if (timer > 600) Window_in();
 	
 	if (B == 180*150) B = 0;
 	Roto_Zoom(SINEX[A&255],SINEY[A&255],B,page);
 	A++;
 	B+=150;
 	
-	if (timer < 80) Window_out();
-	if (timer > 600) Window_in();
 	timer++;
 }
 

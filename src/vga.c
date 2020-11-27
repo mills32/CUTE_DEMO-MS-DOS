@@ -91,13 +91,7 @@ void VGA_mode_X(){
 		system("cls");
 		exit(1);
 	}
-	if ((vector_frame = farcalloc(4*1024,sizeof(byte))) == NULL){
-		VGA_mode_text();
-		printf("Not enough RAM to allocate vector_frame");
-		sleep(2);
-		system("cls");
-		exit(1);
-	}
+	
 	SCR_X = 0;
 	SCR_Y = 0;
 	

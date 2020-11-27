@@ -123,7 +123,6 @@ extern word FONT_VRAM;
 extern byte tileset_palette[];
 extern unsigned char *tile_tempdata; //Temp storage of non tiled data.
 extern char *compiled_code;
-extern byte *vector_frame;
 extern word SCR_X;
 extern word SCR_Y;
 extern word SCR_WX;
@@ -196,6 +195,7 @@ void Homer_PaleteCycle();
 void Cog2D_PaleteCycle();
 void Cog3D_PaleteCycle();
 void Lisa_PaleteCycle();
+void Plasma_PaleteCycle();
 void Sea_PaleteCycle();
 void Tower_PaleteCycle();
 void Chip_PaleteCycle();
@@ -204,12 +204,10 @@ void Credits_PaleteCycle();
 //SCANLINE AND ROTOZOOM EFFECTS
 void Cog3D_Move(word frame);
 void Roto_Zoom(byte x, byte y, word frame, word page);
-void Algae_Move(byte x, word frame);
 
 //VECTORS
 void Very_fast_line(int x1, int y1, int x2, int y2, byte color);
-void Load_Shape(char *file, int sprite_number);
-void Draw_Shape(int sprite_number);
+
 //ADLIB
 void Adlib_Detect();
 void Music_Load(char *fname);
