@@ -185,9 +185,40 @@ void VGA_Fade_out(){
 }
 
 void VGA_Fade_out_text(){
+	int i,j;
 	memcpy(temp_palette, EGA_text_Pal, 16*3);
 	VGA_Set_palette(EGA_text_Pal);
-	VGA_Fade_out();
+	i = 0;
+	//Fade to black
+	asm mov	dx,003c8h
+	asm mov al,0
+	asm out	dx,al
+	while (i < 20){
+		asm mov dx,003c9h //Palete register
+		for(j=0;j<256*3;j++){
+			asm mov bx,j
+			asm cmp	byte ptr temp_palette[bx],0
+			asm je	pal_is_zero
+			asm mov al,byte ptr temp_palette[bx]
+			asm sub al,2
+			asm mov byte ptr temp_palette[bx],al
+			pal_is_zero:
+			asm	mov al,byte ptr temp_palette[bx]
+			asm out dx,al
+		}
+		i ++;
+		//Wait Vsync
+		asm mov		dx,INPUT_STATUS_0
+		WaitNotVsync:
+		asm in      al,dx
+		asm test    al,08h
+		asm jnz		WaitNotVsync
+		WaitVsync:
+		asm in      al,dx
+		asm test    al,08h
+		asm jz		WaitVsync
+	}
+	VGA_Set_palette_to_black();
 }
 
 //PALETTE CYCLING
@@ -221,7 +252,6 @@ void Corruption_PaleteCycle(){
 	if (paloffset_A == 9*2)paloffset_A=0;
 	paloffset_C++;
 }
-
 
 void P8086_PaleteCycle(){
 	word color0 = SCR_Y;
@@ -731,7 +761,6 @@ void Plasma_PaleteCycle(){
 	paloffset_A +=3;
 	if (paloffset_A == 208*3)paloffset_A=0;
 }
-
 
 void Tower_PaleteCycle(){
 	

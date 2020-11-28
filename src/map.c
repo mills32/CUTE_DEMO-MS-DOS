@@ -275,130 +275,6 @@ void draw_map_column(word x, word y, word map_offset){
 	}
 }
 
-void draw_ship_map_column(word x, word y, word map_offset){
-	word TILE_ADDRESS = TILE_VRAM;
-	word screen_offset = (y<<6)+(y<<4)+(y<<2)+(x>>2);
-	word width = map_width;
-	unsigned char *mapdata = map_data;
-	word tilesn = 6;
-	asm{
-		push ds
-		push di
-		push si
-		
-		mov dx,SC_INDEX //dx = indexregister
-		mov ax,0F02h	//INDEX = MASK MAP, 
-		out dx,ax 		//write all the bitplanes.
-		mov dx,GC_INDEX //dx = indexregister
-		mov ax,008h		
-		out dx,ax 
-		
-		mov 	ax,0A000h
-		mov 	ds,ax
-		mov		si,TILE_ADDRESS				//ds:si Tile data VRAM address = FIXED VRAM AT scan line 590; 
-
-		les		bx,[mapdata]
-		add		bx,map_offset
-		mov		al,byte ptr es:[bx]
-		mov		ah,0
-		mov		cl,6
-		shl		ax,cl
-		add		si,ax
-		
-		mov		di,screen_offset		//es:di screen address							
-	}
-	//UNWRAPPED LOOP
-	//DRAW TILES
-	loops0:
-	asm{//COPY TILE
-		mov 	ax,0A000h
-		mov 	es,ax		//es:di screen address
-		
-		mov 	cx,4		//COPY TILE (16 LINES)
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80
-		mov 	cx,4
-		rep		movsb				
-		add 	di,80	//END COPY TILE
-		
-		//SET ADDRESS FOR NEXT TILE
-		mov 	ax,0A000h
-		mov 	ds,ax
-		mov		si,TILE_ADDRESS				//ds:si Tile data VRAM address = FIXED VRAM AT scan line 590; 
-
-		mov		ax,map_offset
-		add		ax,[width]
-		mov		map_offset,ax
-		
-		les		bx,[mapdata]
-		add		bx,map_offset
-		mov		al,byte ptr es:[bx]
-		mov		ah,0
-		mov		cl,6
-		shl		ax,cl
-		add		si,ax
-		
-		mov		ax,[tilesn]
-		dec		ax
-		mov		[tilesn],ax
-		jz		loops
-		jmp		loops0
-	}
-	loops:
-	asm{//END
-	
-		mov dx,GC_INDEX +1 //dx = indexregister
-		mov ax,00ffh		
-		out dx,ax
-		
-		pop si
-		pop di
-		pop ds
-	}
-}
-
 void draw_land_map_column(word x, word y, word map_offset){
 	word TILE_ADDRESS = TILE_VRAM;
 	word screen_offset = (y<<6)+(y<<4)+(y<<2)+(x>>2);
@@ -1034,8 +910,7 @@ void Endless_SideScroll_Map(int y){
 	current_x = (SCR_X>>4)<<4;
 	current_y = ((SCR_Y+240)>>4)<<4;
 	if (current_x > last_x) { 
-		if (Scene == 23)draw_ship_map_column(current_x+320,current_y,((map_offset_Endless+20)%map_width)+(y*map_width));
-		else if (Scene == 6) draw_land_map_column(current_x+320,current_y,((map_offset_Endless+20)%map_width)+(y*map_width));
+		if (Scene == 6) draw_land_map_column(current_x+320,current_y,((map_offset_Endless+20)%map_width)+(y*map_width));
 		else draw_map_column(current_x+320,current_y,((map_offset_Endless+20)%map_width)+(y*map_width));
 		map_offset_Endless++;
 	}

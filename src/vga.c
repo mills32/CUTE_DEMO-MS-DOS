@@ -266,7 +266,8 @@ void VGA_MoveWindow(){
 
 void Window_in(){
 	if (SCR_WY != 0){
-		if ((SCR_WY == 240*2) && (Scene != 20))Print(0,6, "LOADING",1);
+		if (SCR_WY == 240*2) 
+			if (Scene != 20) Print(0,6, "LOADING",1);
 		SCR_WY-=8;
 		VGA_MoveWindow();
 	} else {

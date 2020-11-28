@@ -186,7 +186,7 @@ void main(int argc, char *argv[]){
 	if(argc > 1){
 		sce = atoi(argv[1]);
 		if (sce > 13) sce = 13;
-		printf("You selected scene %i.\nThe program will show it after the intro.\n", sce);
+		printf("Debug - Selected scene %i.\nProgram will run it after the intro.\n", sce);
 	}
 	printf("\nLoading...\r");
 	Adlib_Detect();
@@ -432,22 +432,26 @@ void Load_Land(){
 	map_offset_Endless = 1;
 	sprite[9].pos_x = 7*16;
 	sprite[9].pos_y = -240;
+	Music_Remove_Interrupt();
 }
 void Run_Land(){
 	Road_PaleteCycle();
 	
 	if (timer < 70) {
 		if (SCR_WY == 240*2){
+			Music_Add_Interrupt();
 			//Draw road on window
 			draw_map_row(0,0,17*32);draw_map_row(0,16,18*32);
 			draw_map_row(0,32,19*32);draw_map_row(0,48,20*32);
 			draw_map_row(0,64,21*32);
 			map_offset_Endless = 1;
+			Music_Remove_Interrupt();
 		}
 		Window_out();
+		Music_Update();
 	}
 	
-	if ((timer > 70) && (timer < 900)){
+	if ((timer > 69) && (timer < 900)){
 		Clear_Sprite(9);
 		Draw_Sprite(9);
 		sprite[9].pos_x = 7*16;
@@ -467,6 +471,7 @@ void Run_Land(){
 		}
 		if (A == 29) A = 0;
 		A++;
+		Music_Update();
 	}
 	if ((timer > 899)&&(timer < 1000)){ 
 
@@ -477,16 +482,18 @@ void Run_Land(){
 		}
 		if (A == 29) A = 0;
 		A++;
+		Music_Update();
 	}
 	
 	VGA_Scroll_Vsync();
-	if (timer == 1000){SCR_WY = 480;VGA_Set_Window();}
-	if (timer > 1000) Window_in();
+	if (timer > 1000) {Window_in();Music_Update();}
+	if (timer == 1000){SCR_WY = 480;Music_Add_Interrupt();VGA_Set_Window();Music_Remove_Interrupt();}
 	timer++;
 }
 
 //Homer
 void Load_Homer(){
+	Music_Add_Interrupt();
 	Unload_sprite(9);
 	Load_Sprite("sprites/h_cloud.bmp",4,16);
 	Clone_Sprite(5,4);
@@ -722,15 +729,20 @@ void Load_Ship(){
 	Load_Map("maps/13_ship.tmx",0);
 	A = 0;B = 0;C = 8;D=0;SCR_X = 0; SCR_Y = 0;
 	timer = 0;
+	Music_Remove_Interrupt();
 }
+
+//This was too much for the 8086, I had to remove the scrolling
 void Run_Ship(){
 	byte col1 = 38;
 	byte col2 = 1;
 	byte col3 = 4;
 	byte height = 80;
 	
-	if (timer == 60) memset(VGA,38,100*84);
-	if (timer == 64) memset(VGA+(100*84),4,80*84);
+	if (timer == 60){
+		memset(VGA,38,100*84);
+		memset(VGA+(100*84),4,80*84);Music_Add_Interrupt();
+	}
 	if ((timer > 60)&&(timer < 951)){
 		draw_good_ship((16*7)-4,10+sint[A+39],29+(Ship_Ani[C]*30));
 		
@@ -752,10 +764,7 @@ void Run_Ship(){
 		A++;
 		if (A==140)A = 0;
 		if (B==140)B = 0;
-		if (timer < 130) if (SCR_WY > 176) SCR_WY-=4;
-		if (timer > 130) {B++;SCR_WY = 160 + (sint[B]<<1);}
-		VGA_MoveWindow();
-		SCR_X++;
+		if (timer < 130) if (SCR_WY > 176) {SCR_WY-=4;VGA_MoveWindow();}
 	}
 	D++;
 	if (D == 10) {D = 0; C++;}
@@ -763,24 +772,25 @@ void Run_Ship(){
 
 	if ((timer > 950) && (timer < 1000)){
 		if (SCR_WY < 240*2) {SCR_WY +=8; VGA_MoveWindow();}
-		SCR_X++;
 	}
 
-	Endless_SideScroll_Map(0);
 	VGA_Scroll_Vsync();
-	if (timer < 60) {Window_out();SCR_X++;}
+	if (timer < 60) {Window_out();Music_Update();}
 	if (timer == 1000) {
+		Music_Add_Interrupt();
 		SCR_WY = 240*2; 
 		Load_Tiles("maps/0_win.bmp",1);
 		Load_Map("maps/0_win.tmx",1);
+		Music_Remove_Interrupt();
 	}
-	if (timer > 1000) Window_in();
+	if (timer > 1000) {Music_Update(); Window_in();}
 	timer++;
 	
 }
 
 //SEA SCENE
 void Load_Sea(){
+	Music_Add_Interrupt();
 	Load_Tiles("maps/14_parlx.bmp",0);
 	Load_Image("sprites/rkt_ani.bmp");
 	Load_Map("maps/14_parlx.tmx",0);
