@@ -9,15 +9,15 @@ I think the main problem with VGA, is games were made using the vga as a simple 
 REQUIREMENTS
 ------------
 
-CPU: 8086 8 MHz
+* CPU: 8086 8 MHz
 
-GPU: VGA (256 KB VRAM)
+* GPU: VGA (256 KB VRAM)
 
-RAM: 512KB
+* RAM: 512KB
 
-AUDIO: ADLIB/OPL2 compatible
+* AUDIO: ADLIB/OPL2 compatible
 
-Does it work on an 8088 at 4.77 ?. We don't wanna know, it's a market we can do without... Of course it works, but it will have issues because it won't be able to keep stable 60fps.
+Does it work on an 8088 at 4.77 ?. We don't wanna know, it's a market we can do without... **Of course it works** (according to PCem at least), but it will have issues because it won't be able to keep stable 60fps.
 
 SVGA will show glitches when scrolling, so use just vga.
 
@@ -26,24 +26,24 @@ VGA HARDWARE
 
 So Let's see what the VGA has to offer for the poor and slow 8086.
 
-  -Hardware scroll:
+1. Hardware scroll:
 
 What?... Yes, it has hardware scroll but not too many games used this. Most of the time they used it to change "video page" to use the VGA as two frame buffers to draw. So it is possible to scroll a backgrond with nearly 0 CPU usage. 
 Some games that use VGA(or EGA) scroll are: Supaplex, Commander Keen(EGA), Double Dragon 3, Dyna Blaster... But The use some sort of double buffer and are a bit slow on the 8086. More recent games like turrican II seem to use it, but at this time nothing was programmed for slow 8086 CPU's.
 
-  -16 colors tile map mode
+2. 16 colors tile map mode
 
 VGA(EGA and CGA) has a mode with character cells just like consoles, but it has only 2 colours per cell. Everybody calls it "text mode". As the hardware scroll works also in this mode, you can create maps made of characters and scroll them whith 0 CPU usage. It has only one sprite (cursor). I only found a demo showing a map in text mode. I was going to use it in this demo, but I wanted more than 16 colours. 
 
-  -32 bit transfers (VRAM to VRAM):
+3. 32 bit transfers (VRAM to VRAM):
 
 VGA can transfer 4 pixels at a time from vram to vram, this is usefull to update a column or a row when scrolling maps in mode x. I guess this was used a lot, but to fill the entire screen. In this demo all the scrolling maps you see, are the result of hardware scrolling + updates of 1 column and 1 row of tiles using this 32 bit transfers.
 
-  -Split screen (Window):
+4. Split screen (Window):
 
 A separate part of VRAM that can be used to show things at the bottom of the screen.
 
-  -Palette cycles:
+5. Palette cycles:
 
 This was abused in games, thanks to palette cycling I faked huge animations for the demo.
 
@@ -56,34 +56,34 @@ SCENES
 
 So what is this? Just a bunch of cute scenes:
 
-  -8086 Scroll: it uses hardware scroll and a software asm blitter to update one row + one column of the map.
+1. 8086 Scroll: it uses hardware scroll and a software asm blitter to update one row + one column of the map.
   Also uses assembly code to update colours, so that it fakes a second layer.
   
-  -Mode 7: completely fake 3d effect made using a pre rendered image and palette cycles.
+2. Mode 7: completely fake 3d effect made using a pre rendered image and palette cycles.
   
-  -Road: uses Hardware scrolling and hardware window to show two (real) layers. Road movement is faked using Palette cycles.
+3. Road: uses Hardware scrolling and hardware window to show two (real) layers. Road movement is faked using Palette cycles.
   
-  -Driving Alien (Homer): Harwdare vertical scroll + faked second layer (palette cycles).
+4. Driving Alien (Homer): Harwdare vertical scroll + faked second layer (palette cycles).
   
-  -2D rotation: Completely fake (palette cycles).
+5. 2D rotation: Completely fake (palette cycles).
   
-  -3D rotation: The smaller cogs are palette cycles. The bigger one is a software blitter that draws lines with different textures.
+6. 3D rotation: The smaller cogs are palette cycles. The bigger one is a software blitter that draws lines with different textures.
   
-  -Dental Plan: Again two faked layers (palette cycles + hardware scroll).
+7. Dental Plan: Again two faked layers (palette cycles + hardware scroll).
   
-  -Plasma: I couldn't make a scanline wave effect so I created this plasma. It uses a pre rendered texture in a a special way, so that the cycling   palette creates the plasma effect.
+8. Plasma: I couldn't make a scanline wave effect so I created this plasma. It uses a pre rendered texture in a a special way, so that the cycling   palette creates the plasma effect.
   
-  -Castle: Just a pre rendered image with colours placed carefully to fake the rotation.
+9. Castle: Just a pre rendered image with colours placed carefully to fake the rotation.
   
-  -Rotozoom: A real software rotozoom in assembly, thanks to people in Vintage Computer Federation. Uses double buffer to avoid garbaje on 8086.
+10. Rotozoom: A real software rotozoom in assembly, thanks to people in Vintage Computer Federation. Uses double buffer to avoid garbaje on 8086.
  
-  -Boat: A cute boat drawn using: software blitter + assembly vector drawing + hardware scrolling + Hardware window. 
+11. Boat: A cute boat drawn using: software blitter + assembly vector drawing + hardware scrolling + Hardware window. 
 
-  -Chips: a neat hardware scroll with two sprites and some palette cycling.
+12. Chips: a neat hardware scroll with two sprites and some palette cycling.
   
-  -Parallax: This draws a big low res rocket, and fakes parallax using palette cycles + hardware scrolling.
+13. Parallax: This draws a big low res rocket, and fakes parallax using palette cycles + hardware scrolling.
   
-  -Credits: Nothing special, palette cycles + hardware scrolling.
+14. Credits: Nothing special, palette cycles + hardware scrolling.
 
 
 NOTES
