@@ -88,6 +88,7 @@ void interrupt play_music(void){
 }
 
 void Music_Update(){
+	if (sound_mode!=0){
     while (!imfwait){
         imfwait = music_sdata[music_offset+2];
         opl2_out(music_sdata[music_offset], music_sdata[music_offset+1]);
@@ -99,6 +100,7 @@ void Music_Update(){
 	asm mov al,020h
 	asm mov dx,020h
 	asm out dx, al	//PIC, EOI*/
+	}
 }
 
 void Music_Load(char *fname){
@@ -132,16 +134,18 @@ void Music_Load(char *fname){
 void Music_Add_Interrupt(){
 	//set interrupt and start playing music
 	unsigned long spd = 1193182/60;
+	if (sound_mode!=0){
 	asm CLI //disable interrupts
 	setvect(0x1C, play_music); //interrupt 1C not available on NEC 9800-series PCs.
 	outportb(0x43, 0x36);
 	outportb(0x40, spd);	//lo-byte
 	outportb(0x40, spd >> 8);	//hi-byte	
 	asm STI  //enable interrupts
-	
+	}
 }
 
 void Music_Remove_Interrupt(){
+	if (sound_mode!=0){
 	asm CLI //disable interrupts
 	//reset interrupt
 	outportb(0x43, 0x36);
@@ -151,7 +155,7 @@ void Music_Remove_Interrupt(){
 	//opl2_clear();
 	asm STI  //enable interrupts
 	//music_offset = 0;
-	
+	}
 }
 
 void Music_Unload(){
