@@ -21,6 +21,8 @@ Does it work on an 8088 at 4.77 ?. We don't wanna know, it's a market we can do 
 
 SVGA will show glitches when scrolling, so use just vga.
 
+I still have to disable sound if adlib is not present, because it crashes.
+
 VGA HARDWARE
 ------------
 
