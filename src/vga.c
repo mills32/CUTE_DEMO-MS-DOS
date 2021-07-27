@@ -306,12 +306,17 @@ void VGA_Set_Window(){
 void VGA_Stretch_VRAM(){
 	byte stretch = 1;
 	byte stretch_timer = 0;
+	byte orig,msl;
 	//Stretch vram
 	while (stretch != 7){
-		if (stretch_timer == 4) {stretch_timer= 0;stretch++;}
-		word_out(CRTC_INDEX, V_RETRACE_END, 0x2c);
-		word_out(CRTC_INDEX, MAX_SCAN_LINE, stretch);//Repeat scanline 4 times
-		word_out(0x03d4, V_RETRACE_END, 0x8e);
+		if (stretch_timer == 3) {stretch_timer= 0;stretch++;}
+		outportb( CRTC_INDEX, MAX_SCAN_LINE );//get original MSL data
+		orig = inportb( CRTC_DATA );
+
+		//only set MSL portion of register "" by root42 ""
+		msl = (orig & 0xE0) | (stretch & 0x1F);
+		outportb( CRTC_INDEX, MAX_SCAN_LINE );
+		outportb( CRTC_DATA, msl);
 		stretch_timer++;
 		VGA_Vsync();
 	}
@@ -320,12 +325,14 @@ void VGA_Stretch_VRAM(){
 void VGA_UnStretch_VRAM(){
 	byte stretch = 7;
 	byte stretch_timer = 0;
+	byte orig,msl;
 	//Stretch vram
 	while (stretch != 1){
-		if (stretch_timer == 4) {stretch_timer= 0;stretch--;}
-		word_out(CRTC_INDEX, V_RETRACE_END, 0x2c);
-		word_out(CRTC_INDEX, MAX_SCAN_LINE, stretch);//Repeat scanline 4 times
-		word_out(0x03d4, V_RETRACE_END, 0x8e);
+		if (stretch_timer == 3) {stretch_timer= 0;stretch--;}
+		//only set MSL portion of register "" by root42 ""
+		msl = (orig & 0xE0) | (stretch & 0x1F);
+		outportb( CRTC_INDEX, MAX_SCAN_LINE );
+		outportb( CRTC_DATA, stretch);
 		stretch_timer++;
 		VGA_Vsync();
 	}
@@ -343,6 +350,8 @@ void VGA_mode_text(){
 	VGA_SplitScreen(0);
 	
 	Music_Unload();
+	
+	
 	
 	//Enable cursor
 	outportb(0x3D4, 0x0A);

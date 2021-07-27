@@ -107,34 +107,31 @@ void VGA_Set_palette_to_black(){
 
 void VGA_Fade_in(){
 	int i,j;
-	unsigned char *palette = tileset_palette;
-	VGA_Set_palette_to_black();
-	memset(temp_palette,0x00,256*3);//All colours black
+	unsigned char *pal = temp_palette;
+	memset(temp_palette,256*3,0x00);//All colours black
 	i = 0;
+	
 	//Fade in
 	asm mov	dx,003c8h
 	asm mov al,0
 	asm out	dx,al
-	while (i < 30){
+	while (i < 14){//SVGA FAILED with 15
+		asm lds si,pal		//Get palette address in ds:si
+		asm les di,pal		//Get palette address in es:di
 		asm mov dx,003c9h //Palete register
 		asm mov cx,256*3
 		asm mov bx,0
 		fade_in_loop:
-			asm les si,dword ptr palette
-			asm mov al,byte ptr temp_palette[bx]
-			asm add si,bx
-			asm cmp	al,byte ptr es:[si]
-			asm ja	pal_is_greater
-			asm mov al,byte ptr temp_palette[bx]
-			asm add al,2
-			asm mov byte ptr temp_palette[bx],al
+			asm LODSB //Load byte from DS:SI into AL, then advance SI
+			asm cmp	al,byte ptr tileset_palette[bx]
+			asm jae	pal_is_greater
+			asm add al,4
 			pal_is_greater:
-			
-			asm	mov al,byte ptr temp_palette[bx]
+			asm STOSB //Store byte in AL to ES:DI, then advance DI
 			asm out dx,al
-			
 			asm inc bx
 			asm loop fade_in_loop
+		
 		i ++;
 		asm mov		dx,INPUT_STATUS_0
 		WaitNotVsync:
@@ -146,29 +143,36 @@ void VGA_Fade_in(){
 		asm test    al,08h
 		asm jz		WaitVsync
 	}
-	if (Scene != 0) VGA_Set_palette(tileset_palette);
+	VGA_Set_palette(tileset_palette);
 }
 
 void VGA_Fade_out(){
 	int i,j;
+	unsigned char *pal = temp_palette;
 	i = 0;
+	//asm push ds
+	//asm push di
+	//asm push si
+	
 	//Fade to black
 	asm mov	dx,003c8h
-	asm mov al,0
+	asm mov ax,0
 	asm out	dx,al
-	while (i < 31){
+	while (i < 15){
+		asm lds si,pal		//Get palette address in ds:si
+		asm les di,pal		//Get palette address in es:di
 		asm mov dx,003c9h //Palete register
-		for(j=0;j<256*3;j++){
-			asm mov bx,j
-			asm cmp	byte ptr temp_palette[bx],0
-			asm je	pal_is_zero
-			asm mov al,byte ptr temp_palette[bx]
-			asm sub al,2
-			asm mov byte ptr temp_palette[bx],al
+		asm mov cx,256*3
+		asm mov bx,0
+		fade_out_loop:
+			asm LODSB //Load byte from DS:SI into AL, then advance SI
+			asm cmp al,0
+			asm jz	pal_is_zero
+			asm sub al,4
 			pal_is_zero:
-			asm	mov al,byte ptr temp_palette[bx]
+			asm STOSB //Store byte in AL to ES:DI, then advance DI
 			asm out dx,al
-		}
+			asm loop fade_out_loop
 		i ++;
 		//Wait Vsync
 		asm mov		dx,INPUT_STATUS_0
@@ -181,7 +185,10 @@ void VGA_Fade_out(){
 		asm test    al,08h
 		asm jz		WaitVsync
 	}
-	VGA_Set_palette_to_black();
+	
+	//asm pop ds
+	//asm pop di
+	//asm pop si
 }
 
 void VGA_Fade_out_text(){
@@ -231,7 +238,7 @@ void Corruption_PaleteCycle(){
 	asm mov bx,paloffset_A
 	
 	asm mov	dx,003c8h
-	asm mov al,0
+	asm mov al,1
 	asm out	dx,al
 	asm inc dx		//003c9h Palete register
 	
@@ -264,6 +271,7 @@ void P8086_PaleteCycle(){
 	asm mov ch,0
 	asm mov cl,byte ptr ncolors0
 	asm mov al,byte ptr SCR_Y
+	asm inc al
 	
 	asm mov	dx,003c8h
 	asm out	dx,al
@@ -284,7 +292,7 @@ void P8086_PaleteCycle(){
 	asm jz 	skip_8086
 	//And now, go to color 0
 	asm mov cl,byte ptr ncolors1
-	asm mov al,0
+	asm mov al,1
 	
 	asm mov	dx,003c8h
 	asm out	dx,al
@@ -317,7 +325,7 @@ void Perspective_PaleteCycle(){
 	asm mov bx,paloffset_A
 	
 	asm mov	dx,003c8h
-	asm mov al,0
+	asm mov al,1
 	asm out	dx,al
 	asm inc dx		//003c9h Palete register
 	
@@ -407,7 +415,7 @@ void Road_PaleteCycle(){
 	asm mov bx,paloffset_C
 	
 	asm mov	dx,003c8h
-	asm mov al,0
+	asm mov al,1
 	asm out	dx,al
 	asm inc dx		//003c9h Palete register
 	
@@ -467,7 +475,7 @@ void Homer_PaleteCycle(){
 	asm mov bx,0
 	asm mov cx,16*3
 	asm mov al,byte ptr color0
-	
+	asm inc al
 	asm mov	dx,003c8h
 	asm out	dx,al
 	asm inc dx		//003c9h Palete register
@@ -519,7 +527,7 @@ void Cog2D_PaleteCycle(){
 	asm mov bx,paloffset_C
 	
 	asm mov	dx,003c8h
-	asm mov al,0
+	asm mov al,1
 	asm out	dx,al
 	asm inc dx		//003c9h Palete register
 	
@@ -601,7 +609,7 @@ void Cog3D_PaleteCycle(){
 	//asm CLI
 	asm mov bx,paloffset_A
 	asm mov cx,80
-	asm mov al,0
+	asm mov al,1
 	
 	asm mov	dx,003c8h
 	asm out	dx,al
@@ -626,7 +634,7 @@ void Lisa_PaleteCycle(){
 	asm mov bx,paloffset_A
 	asm add bx,dental_plan
 	asm mov cx,42
-	asm mov al,0
+	asm mov al,1
 	
 	asm mov	dx,003c8h
 	asm out	dx,al
@@ -717,7 +725,7 @@ void Plasma_PaleteCycle(){
 	//asm CLI
 	asm mov bx,paloffset_A
 	asm mov cx,16*3
-	asm mov al,0
+	asm mov al,1
 	
 	asm mov	dx,003c8h
 	asm out	dx,al
@@ -771,7 +779,7 @@ void Tower_PaleteCycle(){
 	asm mov bx,paloffset_A
 	
 	asm mov	dx,003c8h
-	asm mov al,0
+	asm mov al,1
 	asm out	dx,al
 	asm inc dx		//003c9h Palete register
 	
@@ -943,7 +951,7 @@ void Chip_PaleteCycle(){
 	asm mov bx,paloffset_A
 	
 	asm mov	dx,003c8h
-	asm mov al,0
+	asm mov al,1
 	asm out	dx,al
 	asm inc dx		//003c9h Palete register
 	
@@ -973,7 +981,7 @@ void Sea_PaleteCycle(){
 	asm mov bx,paloffset_A
 	
 	asm mov	dx,003c8h
-	asm mov al,0
+	asm mov al,1
 	asm out	dx,al
 	asm inc dx		//003c9h Palete register
 	
@@ -1107,7 +1115,7 @@ void Credits_PaleteCycle(){
 	asm mov bx,paloffset_A
 	
 	asm mov	dx,003c8h
-	asm mov al,0
+	asm mov al,1
 	asm out	dx,al
 	asm inc dx		//003c9h Palete register
 	

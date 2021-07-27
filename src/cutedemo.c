@@ -88,6 +88,7 @@ char introtext[] = {"\
    THIS DEMO :).                                                                \
    SORRY IF I ABUSED VGA COLOR CYCLES      AND HARDWARE SCROLLING.              \
                                                                                 \
+ (SET VOLUME LOW, MUSIC MAY SOUND BAD!) \
                                         \
              - MILLS 2020 -             \
                LOADING...               \
@@ -229,7 +230,7 @@ void Run_Intro(){
 	
 	//Second message
 	j = (7*80)-40;
-	for (i = 0; i < 14;i++){Print(0,i+8,&introtext[j],0);j+=40;}
+	for (i = 0; i < 15;i++){Print(0,i+8,&introtext[j],0);j+=40;}
 
 	//wait key
 	VGA_Fade_in();Clearkb();
@@ -241,23 +242,23 @@ void Run_Intro(){
 	sprite[0].pos_x = 88;
 	sprite[0].pos_y = 17*8;
 	for (i = 0; i < 30;i++)Print(0,i,&introtext[80],0);
-	Print(0,15,&introtext[(13*80)+40],0);
-	while (timer < 120) {
+	Print(0,15,&introtext[(28*40)],0);
+	while (timer < 80) {
 		Draw_Sprite(0);
 		sprite[0].pos_x = 88+timer;
 		A++;
 		if (A == 4){A=0;timer++;}
-		if (timer == 0)Print(0,19,&introtext[(13*80)+80],0);
-		if (timer == 30)Print(0,19,&introtext[(13*80)+120],0);
-		if (timer == 70)Print(0,19,&introtext[(13*80)+160],0);
+		if (timer == 0)Print(0,19,&introtext[(29*40)],0);
+		if (timer == 30)Print(0,19,&introtext[(30*40)],0);
+		if (timer == 70)Print(0,19,&introtext[(31*40)],0);
 		VGA_Scroll_Vsync();
 	}
 	Unload_sprite(0);
 	timer = 0;
-	Print(0,19,&introtext[(13*80)+200],0);
-	Print(0,20,&introtext[(13*80)+240],0);
+	Print(0,19,&introtext[(32*40)],0);
+	Print(0,20,&introtext[(33*40)],0);
 	while (timer < 120) {timer++; VGA_Scroll_Vsync();}
-	
+
 	//Garbage screen
 	VGA_Set_palette_to_black();
 	timer = 0;
@@ -606,7 +607,7 @@ void Run_Roto(){
 	
 	VGA_Scroll_Vsync();
 	if (timer < 80) Window_out();
-	if (timer > 600) Window_in();
+	if (timer > 900) Window_in();
 	
 	if (B == 180*150) B = 0;
 	Roto_Zoom(SINEX[A&255],SINEY[A&255],B,page);

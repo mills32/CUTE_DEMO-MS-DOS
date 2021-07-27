@@ -1001,7 +1001,7 @@ void Load_Font(char *file){
 }
 
 void Set_FontWin_Color(){
-	char *pal = &tileset_palette[250*3];
+	char *pal = &tileset_palette[251*3];
 	VGA_Set_palette_to_black();
 	pal[0] = 23; pal[1] = 23; pal[2] = 63;
 	pal[3] = 63; pal[4] = 63; pal[5] = 63;
