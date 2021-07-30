@@ -20,18 +20,51 @@ byte *music_sdata;
 word imfwait;
 
 void opl2_out(unsigned char reg, unsigned char data){
-	asm mov ah,0
 	asm mov dx, 00388h
 	asm mov al, reg
 	asm out dx, al
+	
+	//Wait at least 3.3 microseconds, this makes it work on all opl2 compatible cards
+	asm mov cx,6
+	wait:
+		asm in ax,dx
+		asm loop wait	//for (i = 0; i < 6; i++) inp(lpt_ctrl);
+	
 	asm inc dx
 	asm mov al, data
 	asm out dx, al
+	
+	//for( i = 35; i ; i-- )inport(0x388);
 }
 
-void opl2_clear(void){
-	int i;
-    for (i=1; i< 256; opl2_out(i++, 0));    //clear all registers
+void opl2_clear(){
+	unsigned char i, slot1, slot2;
+    static unsigned char slotVoice[9][2] = {{0,3},{1,4},{2,5},{6,9},{7,10},{8,11},{12,15},{13,16},{14,17}};
+    static unsigned char offsetSlot[18] = {0,1,2,3,4,5,8,9,10,11,12,13,16,17,18,19,20,21};
+    
+    opl2_out(   1, 0x20);   // Set WSE=1
+    opl2_out(   8,    0);   // Set CSM=0 & SEL=0
+    opl2_out(0xBD,    0);   // Set AM Depth, VIB depth & Rhythm = 0
+    
+    for(i=0; i<9; i++){
+        slot1 = offsetSlot[slotVoice[i][0]];
+        slot2 = offsetSlot[slotVoice[i][1]];
+        
+        opl2_out(0xB0+i, 0);    //turn note off
+        opl2_out(0xA0+i, 0);    //clear frequency
+
+        opl2_out(0xE0+slot1, 0);
+        opl2_out(0xE0+slot2, 0);
+
+        opl2_out(0x60+slot1, 0xff);
+        opl2_out(0x60+slot2, 0xff);
+        opl2_out(0x80+slot1, 0xff);
+        opl2_out(0x80+slot2, 0xff);
+
+        opl2_out(0x40+slot1, 0xff);
+        opl2_out(0x40+slot2, 0xff);
+    }
+	for (i=1; i == 255; i++) opl2_out(i, 0);    //clear all registers
 }
 extern int sound_mode;
 void Adlib_Detect(){ 
@@ -72,6 +105,7 @@ void Adlib_Detect(){
 }
 
 void interrupt play_music(void){
+	asm CLI
 	//byte *ost = music_sdata + music_offset;
 	while (!imfwait){
         imfwait = music_sdata[music_offset+2];
@@ -82,6 +116,7 @@ void interrupt play_music(void){
 	if (music_offset > 0xBFAC) music_offset = 0;
 	imfwait--;
 
+	asm STI
 	asm mov al,020h
 	asm mov dx,020h
 	asm out dx, al	//PIC, EOI

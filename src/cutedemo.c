@@ -88,7 +88,7 @@ char introtext[] = {"\
    THIS DEMO :).                                                                \
    SORRY IF I ABUSED VGA COLOR CYCLES      AND HARDWARE SCROLLING.              \
                                                                                 \
- (SET VOLUME LOW, MUSIC MAY SOUND BAD!) \
+                                        \
                                         \
              - MILLS 2020 -             \
                LOADING...               \
