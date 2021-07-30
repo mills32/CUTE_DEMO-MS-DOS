@@ -5,7 +5,7 @@ Palette cicles
 ********/
 
 #include "cutedemo.h"
-//Leave color 0 set to black, to avoid overscan flashing
+//Leave color 0 set to black, to avoid overscan flashing.
 //Reset in every scene!!!
 word paloffset_A = 0;
 word paloffset_B = 16*3;
