@@ -24,7 +24,7 @@ void opl2_out(unsigned char reg, unsigned char data){
 	asm mov al, reg
 	asm out dx, al
 	
-	//Wait at least 3.3 microseconds, this makes it work on all opl2 compatible cards
+	//Wait at least 3.3 microseconds, this makes it work on all opl2 compatible cards.
 	asm mov cx,6
 	wait:
 		asm in ax,dx
