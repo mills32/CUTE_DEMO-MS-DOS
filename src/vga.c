@@ -154,8 +154,8 @@ void VGA_Scroll_Vsync(){
 
 	//AC index 0x03c0
 	asm mov dx,003c0h
-	asm mov ax,033h
-	asm out dx,ax
+	asm mov al,0x33		//0x20 | 0x13 (palette normal operation | Pel panning reg)	
+	asm out dx,al
 	asm mov al,byte ptr pix
 	asm out dx,al
 	//enable interrupts because we finished doing crazy things
