@@ -117,53 +117,44 @@ void VGA_Scroll_Vsync(){
 	byte _ac;
 	word x = SCR_X;
 	word y = SCR_Y+240;
-	
+	pix = p[x & 3]; //VGA
 	//This is as optimized as it can get wen compiled to asm (I checked)
 	y = (y<<6)+(y<<4)+(y<<2) + (x>>2);	//(y*64)+(y*16)+(y*4) = y*84; + x/4
 	
 	//change scroll registers: LOW_ADDRESS 0x0D; HIGH_ADDRESS 0x0C;
-	asm mov dx,003d4h //VGA PORT
-	asm mov	cl,8
-	asm mov ax,y
-	asm	shl ax,cl
-	asm	or	ax,00Dh	
-	asm out dx,ax	//(y << 8) | 0x0D to VGA port
-	asm mov ax,y
-	asm	and ax,0FF00h
-	asm	or	ax,00Ch
-	asm out dx,ax	//(y & 0xFF00) | 0x0C to VGA port
+	asm {
+		cli
+		mov	cl,8; mov dx,003d4h; //VGA PORT
+		mov ax,y; shl ax,cl; or ax,00Dh; out dx,ax; //(y << 8) | 0x0D; to VGA port
+		mov ax,y; and ax,0FF00h; or ax,00Ch; out dx,ax;	//(y & 0xFF00) | 0x0C; to VGA port
+		sti
+	}
 	
-	//The smooth panning magic happens here
-	
-	//Wait Vsync
-	asm mov		dx,INPUT_STATUS_0
-	WaitNotVsync:
-	asm in      al,dx
-	asm test    al,08h
-	asm jnz		WaitNotVsync
-	WaitVsync:
-	asm in      al,dx
-	asm test    al,08h
-	asm jz		WaitVsync
+	//Try to catch Vertical retrace
+	asm mov	dx,0x3DA; asm mov bl,0x08;
+	WaitNotVsync: asm in al,dx; asm test al,bl; asm jnz WaitNotVsync;
+	WaitVsync:    asm in al,dx; asm test al,bl; asm jz WaitVsync;
 	
 	//disable interrupts because we are doing crazy things
+	//The smooth panning magic happens here
 	//asm cli
-	asm mov		dx,INPUT_STATUS_0 //Read input status, to Reset the VGA flip/flop
-	_ac = inp(AC_INDEX);//Store the value of the controller
-	pix = p[x & 3]; //VGA
-
-	//AC index 0x03c0
-	asm mov dx,003c0h
-	asm mov al,0x33		//0x20 | 0x13 (palette normal operation | Pel panning reg)	
-	asm out dx,al
-	asm mov al,byte ptr pix
-	asm out dx,al
+	//asm mov		dx,INPUT_STATUS_0 //Read input status, to Reset the VGA flip/flop
+	//_ac = inp(AC_INDEX);//Store the value of the controller
+	
+	//The smooth panning happens here
+	asm {
+		cli
+		mov dx,0x03C0;
+		mov al,0x33; out dx,al;	//0x20 | 0x13 (palette normal operation | Pel panning reg)	
+		mov al,byte ptr pix; out dx,al;
+		sti
+	}
+	
 	//enable interrupts because we finished doing crazy things
 	//asm sti
 	//Restore controller value
-	asm mov ax,word ptr _ac
-	asm out dx,ax
-	
+	//asm mov ax,word ptr _ac
+	//asm out dx,ax
 }
 
 void VGA_SplitScreen(int line){
@@ -306,17 +297,12 @@ void VGA_Set_Window(){
 void VGA_Stretch_VRAM(){
 	byte stretch = 1;
 	byte stretch_timer = 0;
-	byte orig,msl;
 	//Stretch vram
 	while (stretch != 7){
-		if (stretch_timer == 3) {stretch_timer= 0;stretch++;}
-		outportb( CRTC_INDEX, MAX_SCAN_LINE );//get original MSL data
-		orig = inportb( CRTC_DATA );
-
-		//only set MSL portion of register "" by root42 ""
-		msl = (orig & 0xE0) | (stretch & 0x1F);
-		outportb( CRTC_INDEX, MAX_SCAN_LINE );
-		outportb( CRTC_DATA, msl);
+		if (stretch_timer == 4) {stretch_timer= 0;stretch++;}
+		word_out(CRTC_INDEX, V_RETRACE_END, 0x2c);
+		word_out(CRTC_INDEX, MAX_SCAN_LINE, stretch);//Repeat scanline 4 times
+		word_out(0x03d4, V_RETRACE_END, 0x8e);
 		stretch_timer++;
 		VGA_Vsync();
 	}
@@ -325,14 +311,12 @@ void VGA_Stretch_VRAM(){
 void VGA_UnStretch_VRAM(){
 	byte stretch = 7;
 	byte stretch_timer = 0;
-	byte orig,msl;
 	//Stretch vram
 	while (stretch != 1){
-		if (stretch_timer == 3) {stretch_timer= 0;stretch--;}
-		//only set MSL portion of register "" by root42 ""
-		msl = (orig & 0xE0) | (stretch & 0x1F);
-		outportb( CRTC_INDEX, MAX_SCAN_LINE );
-		outportb( CRTC_DATA, stretch);
+		if (stretch_timer == 4) {stretch_timer= 0;stretch--;}
+		word_out(CRTC_INDEX, V_RETRACE_END, 0x2c);
+		word_out(CRTC_INDEX, MAX_SCAN_LINE, stretch);//Repeat scanline 4 times
+		word_out(0x03d4, V_RETRACE_END, 0x8e);
 		stretch_timer++;
 		VGA_Vsync();
 	}
@@ -350,8 +334,6 @@ void VGA_mode_text(){
 	VGA_SplitScreen(0);
 	
 	Music_Unload();
-	
-	
 	
 	//Enable cursor
 	outportb(0x3D4, 0x0A);
