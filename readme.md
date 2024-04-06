@@ -77,7 +77,7 @@ So what is this? Just a bunch of cute scenes:
   
 9. Castle: Just a pre rendered image with colours placed carefully to fake the rotation.
   
-10. Rotozoom: A real software rotozoom in assembly, thanks to people in Vintage Computer Federation. Uses double buffer to avoid garbaje on 8086.
+10. Rotozoom: A real software rotozoom in assembly, thanks to people in Vintage Computer Federation. Uses double buffer to avoid garbage on 8086.
  
 11. Boat: A cute boat drawn using: software blitter + assembly vector drawing + hardware scrolling + Hardware window. 
 
